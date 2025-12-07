@@ -16,13 +16,13 @@ export const seedDatabase = async () => {
     
     // Create default workout types
     const workoutTypes = [
-      { name: 'Running', description: 'Running exercise', metValue: 7.0, iconUrl: '🏃' },
-      { name: 'Cycling', description: 'Cycling exercise', metValue: 7.5, iconUrl: '🚴' },
-      { name: 'Swimming', description: 'Swimming exercise', metValue: 6.0, iconUrl: '🏊' },
-      { name: 'Walking', description: 'Walking exercise', metValue: 3.5, iconUrl: '🚶' },
-      { name: 'Strength Training', description: 'Strength training exercise', metValue: 5.0, iconUrl: '💪' },
-      { name: 'Yoga', description: 'Yoga exercise', metValue: 2.5, iconUrl: '🧘' },
-      { name: 'HIIT', description: 'High-intensity interval training', metValue: 8.0, iconUrl: '🔥' },
+      { name: 'Running', description: 'Running exercise', metValue: 7.0, iconUrl: 'https://example.com/icons/running.png' },
+      { name: 'Cycling', description: 'Cycling exercise', metValue: 7.5, iconUrl: 'https://example.com/icons/cycling.png' },
+      { name: 'Swimming', description: 'Swimming exercise', metValue: 6.0, iconUrl: 'https://example.com/icons/swimming.png' },
+      { name: 'Walking', description: 'Walking exercise', metValue: 3.5, iconUrl: 'https://example.com/icons/walking.png' },
+      { name: 'Strength Training', description: 'Strength training exercise', metValue: 5.0, iconUrl: 'https://example.com/icons/strength.png' },
+      { name: 'Yoga', description: 'Yoga exercise', metValue: 2.5, iconUrl: 'https://example.com/icons/yoga.png' },
+      { name: 'HIIT', description: 'High-intensity interval training', metValue: 8.0, iconUrl: 'https://example.com/icons/hiit.png' },
     ];
     
     for (const type of workoutTypes) {
