@@ -12,6 +12,12 @@ interface WorkoutState {
     steps?: number;
     startTime: string;
     endTime: string;
+    // Enhanced fields for real-time data
+    heartRate?: number;
+    avgSpeed?: number;
+    maxSpeed?: number;
+    elevationGain?: number;
+    gpsTrace?: object;
   }>;
   workoutTypes: Array<{
     id: number;

@@ -1,0 +1,51 @@
+{
+  "workouts": [
+    {
+      "workoutActivityType": "HKWorkoutActivityTypeRunning",
+      "startDate": "2023-05-15T06:30:00Z",
+      "endDate": "2023-05-15T07:30:00Z",
+      "duration": 3600,
+      "activeEnergyBurned": 450,
+      "distanceWalkingRunning": 5.2,
+      "stepCount": 6800,
+      "heartRate": 145,
+      "notes": "晨跑，天气晴朗",
+      "locations": [
+        {
+          "latitude": 39.9042,
+          "longitude": 116.4074,
+          "altitude": 45.2,
+          "timestamp": "2023-05-15T06:30:00Z"
+        },
+        {
+          "latitude": 39.9052,
+          "longitude": 116.4084,
+          "altitude": 46.1,
+          "timestamp": "2023-05-15T06:35:00Z"
+        }
+      ]
+    },
+    {
+      "workoutActivityType": "HKWorkoutActivityTypeCycling",
+      "startDate": "2023-05-16T17:00:00Z",
+      "endDate": "2023-05-16T18:30:00Z",
+      "duration": 5400,
+      "activeEnergyBurned": 320,
+      "distanceCycling": 15.7,
+      "heartRate": 125,
+      "notes": "下班后骑行回家"
+    },
+    {
+      "motionType": "10103",
+      "startTime": "2023-05-17T09:00:00Z",
+      "endTime": "2023-05-17T09:45:00Z",
+      "duration": 45,
+      "calorie": 280,
+      "distance": 1.2,
+      "stepCount": 1800,
+      "heartRate": 110,
+      "description": "游泳训练",
+      "polyline": " encoded_polyline_data "
+    }
+  ]
+}

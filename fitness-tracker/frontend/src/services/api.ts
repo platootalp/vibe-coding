@@ -53,11 +53,12 @@ export const userAPI = {
 
 // Workout API
 export const workoutAPI = {
-  getWorkouts: () => api.get('/workouts'),
-  getWorkout: (id: string) => api.get(`/workouts/${id}`),
-  createWorkout: (workoutData: any) => api.post('/workouts', workoutData),
-  updateWorkout: (id: string, workoutData: any) => api.put(`/workouts/${id}`, workoutData),
-  deleteWorkout: (id: string) => api.delete(`/workouts/${id}`),
+  getAll: () => api.get('/workouts'),
+  getById: (id: string) => api.get(`/workouts/${id}`),
+  create: (data: any) => api.post('/workouts', data),
+  update: (id: string, data: any) => api.put(`/workouts/${id}`, data),
+  delete: (id: string) => api.delete(`/workouts/${id}`),
+  import: (data: any) => api.post('/workouts/import', data), // Add import function
 };
 
 // Health Profile API

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { workoutAPI } from '../services/api';
+import WorkoutImport from '../components/WorkoutImport';
 
 interface Workout {
   id: string;
@@ -11,6 +12,12 @@ interface Workout {
   steps?: number;
   date: string;
   notes?: string;
+  // Enhanced fields for real-time data
+  heartRate?: number;
+  avgSpeed?: number;
+  maxSpeed?: number;
+  elevationGain?: number;
+  gpsTrace?: object;
 }
 
 const Workouts: React.FC = () => {
@@ -18,6 +25,7 @@ const Workouts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
 
   // Form state
@@ -29,6 +37,11 @@ const Workouts: React.FC = () => {
   const [steps, setSteps] = useState('');
   const [date, setDate] = useState('');
   const [notes, setNotes] = useState('');
+  // Enhanced fields for real-time data
+  const [heartRate, setHeartRate] = useState('');
+  const [avgSpeed, setAvgSpeed] = useState('');
+  const [maxSpeed, setMaxSpeed] = useState('');
+  const [elevationGain, setElevationGain] = useState('');
 
   useEffect(() => {
     fetchWorkouts();
@@ -63,7 +76,12 @@ const Workouts: React.FC = () => {
         distance: distance ? parseFloat(distance) : undefined,
         steps: steps ? parseInt(steps) : undefined,
         date: date || new Date().toISOString().split('T')[0],
-        notes
+        notes,
+        // Enhanced fields for real-time data
+        heartRate: heartRate ? parseInt(heartRate) : undefined,
+        avgSpeed: avgSpeed ? parseFloat(avgSpeed) : undefined,
+        maxSpeed: maxSpeed ? parseFloat(maxSpeed) : undefined,
+        elevationGain: elevationGain ? parseFloat(elevationGain) : undefined
       };
 
       if (editingWorkout) {
@@ -121,6 +139,11 @@ const Workouts: React.FC = () => {
     setSteps(workout.steps?.toString() || '');
     setDate(workout.date.split('T')[0]);
     setNotes(workout.notes || '');
+    // Enhanced fields for real-time data
+    setHeartRate(workout.heartRate?.toString() || '');
+    setAvgSpeed(workout.avgSpeed?.toString() || '');
+    setMaxSpeed(workout.maxSpeed?.toString() || '');
+    setElevationGain(workout.elevationGain?.toString() || '');
     setShowForm(true);
   };
 
@@ -144,6 +167,11 @@ const Workouts: React.FC = () => {
     setSteps('');
     setDate('');
     setNotes('');
+    // Enhanced fields for real-time data
+    setHeartRate('');
+    setAvgSpeed('');
+    setMaxSpeed('');
+    setElevationGain('');
     setEditingWorkout(null);
     setShowForm(false);
   };
@@ -390,13 +418,26 @@ const Workouts: React.FC = () => {
           <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">🏋️‍♂️ 运动记录</h1>
           <p className="text-gray-500 mt-2">管理您的所有健身活动</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold"
-        >
-          {showForm ? '❌ 取消' : '➕ 添加运动'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowImport(!showImport)}
+            className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-6 rounded-xl hover:from-green-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold"
+          >
+            {showImport ? '❌ 取消导入' : '📥 导入数据'}
+          </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold"
+          >
+            {showForm ? '❌ 取消' : '➕ 添加运动'}
+          </button>
+        </div>
       </div>
+
+      {/* Workout Import */}
+      {showImport && (
+        <WorkoutImport onImportSuccess={fetchWorkouts} />
+      )}
 
       {/* Workout Form */}
       {showForm && (
@@ -459,6 +500,62 @@ const Workouts: React.FC = () => {
               {/* 动态字段根据运动类型显示 */}
               {renderDynamicFields()}
               
+              {/* Enhanced fields for real-time data */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                  ❤️ 心率 (bpm)
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="70"
+                  value={heartRate}
+                  onChange={(e) => setHeartRate(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                  🚀 平均速度 (km/h)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="10.5"
+                  value={avgSpeed}
+                  onChange={(e) => setAvgSpeed(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                  🏁 最大速度 (km/h)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="15.2"
+                  value={maxSpeed}
+                  onChange={(e) => setMaxSpeed(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                  📈 爬升高度 (米)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="50.0"
+                  value={elevationGain}
+                  onChange={(e) => setElevationGain(e.target.value)}
+                />
+              </div>
+              
               <div>
                 <label className="block text-gray-700 font-semibold mb-2 text-sm">
                   🔥 消耗卡路里 (自动计算)
@@ -514,7 +611,7 @@ const Workouts: React.FC = () => {
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🏃‍♂️</div>
             <p className="text-gray-500 text-lg">暂无运动记录</p>
-            <p className="text-gray-400 mt-2">点击“添加运动”按钮开始记录吧！</p>
+            <p className="text-gray-400 mt-2">点击"添加运动"或"导入数据"按钮开始记录吧！</p>
           </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">

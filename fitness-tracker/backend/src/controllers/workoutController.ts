@@ -50,7 +50,8 @@ export const getWorkoutById = async (req: AuthRequest, res: Response): Promise<v
 // @access  Private
 export const createWorkout = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, type, duration, calories, distance, steps, date, notes } = req.body;
+    const { name, type, duration, calories, distance, steps, date, notes, 
+            heartRate, avgSpeed, maxSpeed, elevationGain, gpsTrace } = req.body;
     
     const workout = await Workout.create({
       userId: req.user?.id,
@@ -61,7 +62,12 @@ export const createWorkout = async (req: AuthRequest, res: Response): Promise<vo
       distance,
       steps,
       date,
-      notes
+      notes,
+      heartRate,
+      avgSpeed,
+      maxSpeed,
+      elevationGain,
+      gpsTrace
     });
     
     res.status(201).json(workout);
@@ -75,7 +81,8 @@ export const createWorkout = async (req: AuthRequest, res: Response): Promise<vo
 // @access  Private
 export const updateWorkout = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, type, duration, calories, distance, steps, date, notes } = req.body;
+    const { name, type, duration, calories, distance, steps, date, notes,
+            heartRate, avgSpeed, maxSpeed, elevationGain, gpsTrace } = req.body;
     
     const workout = await Workout.findByPk(req.params.id);
     
@@ -98,6 +105,11 @@ export const updateWorkout = async (req: AuthRequest, res: Response): Promise<vo
     workout.steps = steps !== undefined ? steps : workout.steps;
     workout.date = date || workout.date;
     workout.notes = notes || workout.notes;
+    workout.heartRate = heartRate !== undefined ? heartRate : workout.heartRate;
+    workout.avgSpeed = avgSpeed !== undefined ? avgSpeed : workout.avgSpeed;
+    workout.maxSpeed = maxSpeed !== undefined ? maxSpeed : workout.maxSpeed;
+    workout.elevationGain = elevationGain !== undefined ? elevationGain : workout.elevationGain;
+    workout.gpsTrace = gpsTrace !== undefined ? gpsTrace : workout.gpsTrace;
     
     const updatedWorkout = await workout.save();
     res.json(updatedWorkout);
@@ -127,6 +139,49 @@ export const deleteWorkout = async (req: AuthRequest, res: Response): Promise<vo
     await workout.destroy();
     res.json({ message: 'Workout removed' });
   } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Import workouts from external sources (Apple Health, Huawei Health, etc.)
+// @route   POST /api/workouts/import
+// @access  Private
+export const importWorkouts = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { workouts } = req.body;
+    
+    if (!Array.isArray(workouts)) {
+      res.status(400).json({ message: 'Workouts must be an array' });
+      return;
+    }
+    
+    // Validate and transform imported workouts
+    const validWorkouts = workouts.map(workout => ({
+      userId: req.user?.id,
+      name: workout.name || 'Imported Workout',
+      type: workout.type || 'other',
+      duration: workout.duration || 0,
+      calories: workout.calories || 0,
+      distance: workout.distance,
+      steps: workout.steps,
+      date: workout.date || new Date(),
+      notes: workout.notes,
+      heartRate: workout.heartRate,
+      avgSpeed: workout.avgSpeed,
+      maxSpeed: workout.maxSpeed,
+      elevationGain: workout.elevationGain,
+      gpsTrace: workout.gpsTrace
+    }));
+    
+    // Bulk create workouts
+    const createdWorkouts = await Workout.bulkCreate(validWorkouts);
+    
+    res.status(201).json({
+      message: `Successfully imported ${createdWorkouts.length} workouts`,
+      workouts: createdWorkouts
+    });
+  } catch (error) {
+    console.error('Error importing workouts:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

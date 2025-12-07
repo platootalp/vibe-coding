@@ -14,12 +14,18 @@ interface WorkoutAttributes {
   steps?: number;
   date: Date;
   notes?: string;
+  // Enhanced fields for real-time data
+  heartRate?: number; // bpm
+  avgSpeed?: number; // km/h
+  maxSpeed?: number; // km/h
+  elevationGain?: number; // meters
+  gpsTrace?: object; // GeoJSON or array of coordinates
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 // Define the creation attributes (id and timestamps are auto-generated)
-interface WorkoutCreationAttributes extends Optional<WorkoutAttributes, 'id' | 'createdAt' | 'updatedAt' | 'distance' | 'steps' | 'notes'> {}
+interface WorkoutCreationAttributes extends Optional<WorkoutAttributes, 'id' | 'createdAt' | 'updatedAt' | 'distance' | 'steps' | 'notes' | 'heartRate' | 'avgSpeed' | 'maxSpeed' | 'elevationGain' | 'gpsTrace'> {}
 
 // Define the Workout model class
 class Workout extends Model<WorkoutAttributes, WorkoutCreationAttributes> implements WorkoutAttributes {
@@ -33,6 +39,12 @@ class Workout extends Model<WorkoutAttributes, WorkoutCreationAttributes> implem
   public steps?: number;
   public date!: Date;
   public notes?: string;
+  // Enhanced fields for real-time data
+  public heartRate?: number;
+  public avgSpeed?: number;
+  public maxSpeed?: number;
+  public elevationGain?: number;
+  public gpsTrace?: object;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -98,6 +110,40 @@ Workout.init(
     },
     notes: {
       type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    // Enhanced fields for real-time data
+    heartRate: {
+      type: DataTypes.SMALLINT.UNSIGNED,
+      allowNull: true,
+      validate: {
+        min: 0,
+        max: 300,
+      },
+    },
+    avgSpeed: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      validate: {
+        min: 0,
+      },
+    },
+    maxSpeed: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      validate: {
+        min: 0,
+      },
+    },
+    elevationGain: {
+      type: DataTypes.DECIMAL(6, 2),
+      allowNull: true,
+      validate: {
+        min: 0,
+      },
+    },
+    gpsTrace: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
   },
