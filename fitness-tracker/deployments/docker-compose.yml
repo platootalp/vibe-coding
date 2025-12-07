@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fitness-tracker-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fitnessTracker
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: fitnesspass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fitness-tracker-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      JWT_SECRET: fitnessTrackerSecretKey123
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: fitnesspass
+      MYSQL_DATABASE: fitnessTracker
+    depends_on:
+      - mysql
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fitness-tracker-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

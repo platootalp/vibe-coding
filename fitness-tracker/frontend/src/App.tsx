@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Workouts from './pages/Workouts';
+import WorkoutPlans from './pages/WorkoutPlans';
 import Profile from './pages/Profile';
 import Home from './pages/Home';
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/workouts" element={<Workouts />} />
+            <Route path="/workout-plans" element={<WorkoutPlans />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>

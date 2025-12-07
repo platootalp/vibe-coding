@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fitness-tracker-mysql-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: fitnessTracker
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - fitness-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: fitness-tracker-redis-prod
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - fitness-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: fitness-tracker-rabbitmq-prod
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data_prod:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: fitnessuser
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    networks:
+      - fitness-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fitness-tracker-backend-prod
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: fitnessTracker
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_URL: amqp://fitnessuser:${RABBITMQ_PASSWORD}@rabbitmq:5672
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - fitness-network
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fitness-tracker-frontend-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - fitness-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: fitness-tracker-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - frontend_static_prod:/usr/share/nginx/html
+    depends_on:
+      - frontend
+    networks:
+      - fitness-network
+
+networks:
+  fitness-network:
+    driver: bridge
+
+volumes:
+  mysql_data_prod:
+  redis_data_prod:
+  rabbitmq_data_prod:
+  frontend_static_prod:

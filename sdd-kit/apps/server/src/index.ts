@@ -18,8 +18,8 @@ await server.register(cors, { origin: true });
 const projectRoot = process.env.SDD_PROJECT_ROOT ?? process.cwd();
 const engine = new SddEngine({ projectRoot });
 
-const ok = <T>(data: T) => ({ success: true, data });
-const fail = (error: unknown) => ({
+const ok = <T>(data: T): { success: true; data: T } => ({ success: true, data });
+const fail = (error: unknown): { success: false; error: string } => ({
   success: false,
   error: error instanceof Error ? error.message : "未知错误"
 });

@@ -1,271 +1,181 @@
-# Fitness Tracker 健身追踪器
+# 生产级健身健康追踪系统 (Fitness Tracker)
 
-一个完整的健身追踪和管理平台，包含用户注册登录、个人资料管理、运动计划制定、健身数据记录和统计图表展示等功能。
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/docker-supported-blue.svg)](https://www.docker.com/)
 
-## 功能特性
+一个功能完整的生产级健身健康追踪系统，支持用户管理、运动记录、健康档案、智能计划、膳食记录、社交互动等功能。
 
-- 用户注册和登录认证
-- 个人资料管理（姓名、年龄、身高、体重等）
-- 运动数据记录（步数、卡路里消耗、运动时长、距离等）
-- 运动统计数据可视化展示
-- 响应式设计，支持移动端和桌面端
+## 🌟 特性
 
-## 技术栈
+### 核心功能
+- **用户体系增强**
+  - OAuth2 登录（微信、Apple、Google）
+  - 多租户支持（不同健身教练/工作室使用）
+  - 用户角色：普通用户 / 教练 / 管理员
+  - 用户设备同步（手环、手表上传数据）
 
-### 前端
-- React + TypeScript
-- TailwindCSS (响应式设计)
-- React Router (路由管理)
-- Axios (HTTP客户端)
+- **健康档案管理**
+  - 身体指标：BMI、体脂率、基础代谢BMR
+  - 健康趋势（周/月/季度/年）
+  - 数据自动计算服务（后台任务）
 
-### 后端
-- Node.js + Express
-- TypeScript
-- MySQL + Sequelize (数据库)
-- JWT (身份验证)
-- Bcryptjs (密码加密)
+- **智能运动计划**
+  - AI 推荐运动计划
+  - 训练周期（周计划 / 月计划）
+  - 训练提醒（推送 / 邮件）
+  - 支持用户自定义
 
-## 项目结构
+- **膳食记录与营养分析**
+  - 食物数据库（能量、蛋白质、脂肪、碳水）
+  - 每日饮食记录
+  - 自动计算每日营养摄入
+  - 健康饮食评分模型
+
+- **运动记录增强**
+  - 支持实时数据（心率、速度、GPS轨迹）
+  - 自动识别运动类型（基于模式识别）
+  - 数据导入：Apple Health、华为运动健康
+
+- **统计分析 Dashboard**
+  - 周/月运动趋势
+  - 热点运动时段
+  - 卡路里消耗预测
+  - 运动量排名（社交榜单可选）
+
+- **社交与激励系统**
+  - 朋友圈动态（运动记录分享）
+  - 排行榜（好友/本地/全球）
+  - 勋章系统（连续运动天数、里程成就等）
+
+- **通知系统**
+  - 邮件、短信、APP 推送
+  - 多渠道策略
+  - 异步队列（RabbitMQ / Kafka）
+
+- **系统管理后台**
+  - 用户管理、运动记录管理
+  - 体征数据审计
+  - 训练计划模板管理
+
+## 🏗️ 技术架构
+
+### 前端技术栈
+- **核心框架**：React 18 + TypeScript
+- **状态管理**：Redux Toolkit
+- **数据获取**：React Query + Axios
+- **UI组件库**：shadcn/ui + TailwindCSS
+- **SPA + PWA**：支持离线使用
+- **图表库**：Recharts
+- **构建工具**：Vite
+
+### 后端技术栈
+- **核心框架**：Node.js + Express + TypeScript
+- **架构模式**：Clean Architecture（整洁架构）
+- **ORM框架**：Sequelize + MySQL
+- **缓存系统**：Redis
+- **消息队列**：RabbitMQ
+- **认证授权**：JWT + OAuth2
+- **API文档**：Swagger + OpenAPI
+- **测试框架**：Jest + Supertest
+
+### DevOps技术栈
+- **容器化**：Docker
+- **编排工具**：Docker Compose
+- **反向代理**：Nginx
+- **CI/CD**：GitHub Actions
+- **监控**：Prometheus + Grafana
+
+## 📁 项目结构
 
 ```
 fitness-tracker/
+├── backend/           # 后端服务
 ├── frontend/          # 前端应用
-│   ├── src/
-│   │   ├── components/   # 公共组件
-│   │   ├── pages/        # 页面组件
-│   │   ├── services/     # API服务
-│   │   └── ...
-│   └── ...
-├── backend/           # 后端API
-│   ├── src/
-│   │   ├── controllers/  # 控制器
-│   │   ├── models/       # 数据模型
-│   │   ├── routes/       # 路由
-│   │   ├── middleware/   # 中间件
-│   │   └── ...
-│   └── ...
-└── mysql/             # MySQL初始化脚本
+├── deployments/       # 部署配置
+├── docs/              # 文档目录
+├── mysql/             # 数据库脚本
+└── tests/             # 测试工具
 ```
 
-## 快速开始
+详细的项目结构说明请查看 [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
+
+## 🚀 快速开始
 
 ### 环境要求
-- Node.js >= 14.x
-- Docker & Docker Compose (推荐)
+- Node.js >= 18.0.0
+- Docker & Docker Compose
+- Git
 
-### 安装步骤
+### 开发环境启动
 
-1. 克隆项目仓库
+1. **克隆代码仓库**：
 ```bash
 git clone <repository-url>
+cd fitness-tracker
 ```
 
-2. 安装前端依赖
+2. **启动开发环境**：
 ```bash
-cd frontend
-npm install
-```
-
-3. 安装后端依赖
-```bash
-cd ../backend
-npm install
-```
-
-## Docker化部署
-
-### 使用Docker Compose一键部署
-
-项目已完全Docker化，可以通过Docker Compose一键部署整个应用。
-
-#### 生产环境部署
-
-```bash
-# 构建并启动所有服务
-docker-compose up -d
-
-# 查看服务状态
-docker-compose ps
-
-# 停止所有服务
-docker-compose down
-```
-
-#### 开发环境部署
-
-```bash
-# 构建并启动开发环境
+cd deployments
 docker-compose -f docker-compose.dev.yml up -d
-
-# 查看服务状态
-docker-compose -f docker-compose.dev.yml ps
-
-# 停止所有服务
-docker-compose -f docker-compose.dev.yml down
 ```
 
-### 单独构建和运行容器
+3. **访问应用**：
+- 前端：http://localhost:3000
+- 后端API：http://localhost:3001
+- 数据库：localhost:3306
 
-#### 构建前端镜像
+### 生产环境部署
+
+请参考 [DEPLOYMENT.md](DEPLOYMENT.md) 文件获取详细的部署说明。
+
+## 🛢️ 数据库设计
+
+系统采用MySQL作为主数据库，支持读写分离和分表策略。详细的数据库设计请查看 [DATABASE_DESIGN.md](DATABASE_DESIGN.md)
+
+## 🧪 测试
+
+### 后端测试
+```bash
+cd backend
+npm run test
+```
+
+### 前端测试
 ```bash
 cd frontend
-docker build -t fitness-tracker-frontend .
+npm run test
 ```
 
-#### 构建后端镜像
-```bash
-cd backend
-docker build -t fitness-tracker-backend .
-```
+## 📚 文档
 
-#### 运行MySQL容器
-```bash
-docker run -d \
-  --name mysql \
-  -p 3306:3306 \
-  -e MYSQL_ROOT_PASSWORD=rootpassword \
-  -e MYSQL_DATABASE=fitnessTracker \
-  -e MYSQL_USER=fitnessuser \
-  -e MYSQL_PASSWORD=fitnesspass \
-  mysql:8.0
-```
+- [架构设计](ARCHITECTURE.md)
+- [数据库设计](DATABASE_DESIGN.md)
+- [部署指南](DEPLOYMENT.md)
+- [项目结构](PROJECT_STRUCTURE.md)
+- [API文档](docs/4.%20API文档.md)
+- [测试文档](docs/7.%20测试文档.md)
 
-## API 接口
+## 🤝 贡献
 
-### 认证接口
-- `POST /api/auth/register` - 用户注册
-- `POST /api/auth/login` - 用户登录
+欢迎提交Issue和Pull Request来改进这个项目！
 
-### 用户接口
-- `GET /api/users/profile` - 获取用户资料
-- `PUT /api/users/profile` - 更新用户资料
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
 
-### 运动记录接口
-- `GET /api/workouts` - 获取所有运动记录
-- `POST /api/workouts` - 创建新的运动记录
-- `GET /api/workouts/:id` - 根据ID获取运动记录
-- `PUT /api/workouts/:id` - 更新运动记录
-- `DELETE /api/workouts/:id` - 删除运动记录
+## 📄 许可证
 
-### 统计接口
-- `GET /api/stats/workouts` - 获取运动统计数据
-- `GET /api/stats/weekly` - 获取周度统计数据
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-## 数据库设计
+## 👥 作者
 
-### 用户表 (users)
-```sql
-CREATE TABLE users (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(100) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,
-  age TINYINT UNSIGNED,
-  height SMALLINT UNSIGNED,
-  weight SMALLINT UNSIGNED,
-  gender ENUM('male', 'female', 'other'),
-  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
+Fitness Tracker © 2025 由 [Your Name] 开发
 
-### 运动记录表 (workouts)
-```sql
-CREATE TABLE workouts (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  userId INT UNSIGNED NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  type ENUM('running', 'cycling', 'swimming', 'walking', 'strength', 'yoga', 'other') NOT NULL,
-  duration SMALLINT UNSIGNED NOT NULL,
-  calories SMALLINT UNSIGNED NOT NULL,
-  distance DECIMAL(5,2),
-  steps MEDIUMINT UNSIGNED,
-  date DATETIME NOT NULL,
-  notes TEXT,
-  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-```
+## 🙏 致谢
 
-## 本地开发
-
-### 启动开发服务器
-
-前端:
-```bash
-cd frontend
-npm run dev
-```
-
-后端:
-```bash
-cd backend
-npm run dev
-```
-
-默认情况下，前端运行在 http://localhost:3000，后端API运行在 http://localhost:3001
-
-### 环境变量配置
-
-在 `backend/.env` 文件中配置：
-```env
-NODE_ENV=development
-PORT=3001
-JWT_SECRET=your_jwt_secret_key
-
-# MySQL Configuration
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=your_mysql_user
-MYSQL_PASSWORD=your_mysql_password
-MYSQL_DATABASE=fitnessTracker
-```
-
-## 部署
-
-### 构建生产版本
-
-前端:
-```bash
-cd frontend
-npm run build
-```
-
-后端:
-```bash
-cd backend
-npm run build
-```
-
-### 生产环境运行
-
-```bash
-cd backend
-npm start
-```
-
-## 开发指南
-
-### 添加新功能
-
-1. 在后端创建相应的数据模型 (models/)
-2. 创建控制器处理业务逻辑 (controllers/)
-3. 添加API路由 (routes/)
-4. 在前端创建对应的页面组件 (pages/)
-5. 更新API服务 (services/api.ts)
-
-### 代码规范
-
-- 使用TypeScript进行类型检查
-- 遵循React Hooks最佳实践
-- 使用TailwindCSS工具类进行样式设计
-- 保持代码结构清晰，组件职责单一
-
-## 贡献
-
-欢迎提交Issue和Pull Request来改进这个项目。
-
-## 许可证
-
-MIT License
+- 感谢所有为此项目做出贡献的开源软件
+- 感谢社区的支持和反馈

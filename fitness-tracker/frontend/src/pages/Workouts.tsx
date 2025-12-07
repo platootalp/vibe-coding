@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { workoutAPI } from '../services/api';
 
 interface Workout {
-  _id: string;
+  id: string;
   name: string;
   type: string;
   duration: number;
@@ -49,12 +49,18 @@ const Workouts: React.FC = () => {
     e.preventDefault();
     
     try {
+      // 根据运动类型动态计算卡路里消耗
+      let calculatedCalories = parseInt(calories);
+      if (!calculatedCalories || isNaN(calculatedCalories)) {
+        calculatedCalories = calculateCalories(type, parseInt(duration) || 0, distance ? parseFloat(distance) : undefined, steps ? parseInt(steps) : undefined);
+      }
+      
       const workoutData = {
         name,
         type,
-        duration: parseInt(duration),
-        calories: parseInt(calories),
-        distance: distance ? parseInt(distance) : undefined,
+        duration: parseInt(duration) || 0,
+        calories: calculatedCalories,
+        distance: distance ? parseFloat(distance) : undefined,
         steps: steps ? parseInt(steps) : undefined,
         date: date || new Date().toISOString().split('T')[0],
         notes
@@ -62,7 +68,7 @@ const Workouts: React.FC = () => {
 
       if (editingWorkout) {
         // Update existing workout
-        await workoutAPI.update(editingWorkout._id, workoutData);
+        await workoutAPI.update(editingWorkout.id, workoutData);
       } else {
         // Create new workout
         await workoutAPI.create(workoutData);
@@ -74,6 +80,35 @@ const Workouts: React.FC = () => {
     } catch (err) {
       setError('保存运动记录失败');
     }
+  };
+
+  // 根据运动类型计算卡路里消耗
+  const calculateCalories = (type: string, duration: number, distance?: number, steps?: number): number => {
+    // 基础代谢率估算（单位：卡路里/分钟）
+    const baseMetabolicRates: Record<string, number> = {
+      running: 10,    // 跑步
+      cycling: 8,     // 骑行
+      swimming: 9,    // 游泳
+      walking: 4,     // 步行
+      strength: 6,    // 力量训练
+      yoga: 3,        // 瑜伽
+      other: 5        // 其他
+    };
+    
+    const rate = baseMetabolicRates[type] || 5;
+    let calculatedCalories = rate * duration;
+    
+    // 根据距离调整卡路里（如果提供了距离）
+    if (distance && distance > 0) {
+      calculatedCalories += distance * 50; // 每公里额外消耗50卡路里
+    }
+    
+    // 根据步数调整卡路里（如果提供了步数）
+    if (steps && steps > 0) {
+      calculatedCalories += steps * 0.05; // 每步额外消耗0.05卡路里
+    }
+    
+    return Math.round(calculatedCalories);
   };
 
   const handleEdit = (workout: Workout) => {
@@ -111,6 +146,210 @@ const Workouts: React.FC = () => {
     setNotes('');
     setEditingWorkout(null);
     setShowForm(false);
+  };
+
+  // 根据运动类型显示不同的字段
+  const renderDynamicFields = () => {
+    switch (type) {
+      case 'running':
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                📍 距离 (公里)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="5.0"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                ⏱️ 配速 (分钟/公里)
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="5:30"
+                readOnly
+                value={duration && distance ? `${(parseInt(duration) / parseFloat(distance || '1')).toFixed(2)} min/km` : ''}
+              />
+            </div>
+          </>
+        );
+      case 'cycling':
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                📍 距离 (公里)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="20.0"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                🚴 平均速度 (公里/小时)
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="20 km/h"
+                readOnly
+                value={duration && distance ? `${(parseFloat(distance || '0') / (parseInt(duration) / 60)).toFixed(2)} km/h` : ''}
+              />
+            </div>
+          </>
+        );
+      case 'swimming':
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                🏊 泳池长度 (米)
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="25"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                🔄 游泳圈数
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="20"
+                value={steps}
+                onChange={(e) => setSteps(e.target.value)}
+              />
+            </div>
+          </>
+        );
+      case 'walking':
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                📍 距离 (公里)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="3.0"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                👣 步数
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="5000"
+                value={steps}
+                onChange={(e) => setSteps(e.target.value)}
+              />
+            </div>
+          </>
+        );
+      case 'strength':
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                🏋️ 训练组数
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="3"
+                value={steps}
+                onChange={(e) => setSteps(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                🔁 每组次数
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="12"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+          </>
+        );
+      case 'yoga':
+        return (
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2 text-sm">
+              🧘 瑜伽类型
+            </label>
+            <select
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            >
+              <option value="">选择瑜伽类型</option>
+              <option value="hatha">哈他瑜伽</option>
+              <option value="vinyasa">流瑜伽</option>
+              <option value="ashtanga">阿斯汤加瑜伽</option>
+              <option value="yin">阴瑜伽</option>
+              <option value="restorative">修复瑜伽</option>
+            </select>
+          </div>
+        );
+      default:
+        return (
+          <>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                📍 距离 (公里)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="5.0"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                👣 步数
+              </label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="10000"
+                value={steps}
+                onChange={(e) => setSteps(e.target.value)}
+              />
+            </div>
+          </>
+        );
+    }
   };
 
   const getTypeLabel = (type: string) => {
@@ -217,44 +456,24 @@ const Workouts: React.FC = () => {
                 />
               </div>
               
+              {/* 动态字段根据运动类型显示 */}
+              {renderDynamicFields()}
+              
               <div>
                 <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  🔥 消耗卡路里 *
+                  🔥 消耗卡路里 (自动计算)
                 </label>
                 <input
                   type="number"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-100"
+                  placeholder="自动计算"
                   value={calories}
                   onChange={(e) => setCalories(e.target.value)}
-                  required
+                  readOnly={!editingWorkout} // 编辑时允许手动修改
                 />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  📍 距离 (公里)
-                </label>
-                <input
-                  type="number"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="5.0"
-                  value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  👣 步数
-                </label>
-                <input
-                  type="number"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="10000"
-                  value={steps}
-                  onChange={(e) => setSteps(e.target.value)}
-                />
+                {!editingWorkout && (
+                  <p className="text-xs text-gray-500 mt-1">根据运动类型和数据自动计算，编辑时可手动修改</p>
+                )}
               </div>
               
               <div>
@@ -268,19 +487,6 @@ const Workouts: React.FC = () => {
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
-            </div>
-            
-            <div className="mt-4">
-              <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                📝 备注
-              </label>
-              <textarea
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                rows={3}
-                placeholder="添加任何额外信息..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              ></textarea>
             </div>
             
             <div className="mt-6 flex gap-3">
@@ -336,7 +542,7 @@ const Workouts: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {workouts.map((workout) => (
-                <tr key={workout._id} className="hover:bg-blue-50 transition-colors duration-150">
+                <tr key={workout.id} className="hover:bg-blue-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-gray-900">{workout.name}</div>
                   </td>
@@ -364,7 +570,7 @@ const Workouts: React.FC = () => {
                       ✏️ 编辑
                     </button>
                     <button
-                      onClick={() => handleDelete(workout._id)}
+                      onClick={() => handleDelete(workout.id)}
                       className="text-red-600 hover:text-red-900 font-semibold transition-colors duration-150"
                     >
                       🗑️ 删除

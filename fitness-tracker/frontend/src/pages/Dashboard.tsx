@@ -1,171 +1,256 @@
-import React, { useState, useEffect } from 'react';
-import { statsAPI } from '../services/api';
-
-interface WorkoutStat {
-  totalWorkouts: number;
-  totalDuration: number;
-  totalCalories: number;
-  totalDistance: number;
-  workoutsByType: {
-    _id: string;
-    count: number;
-  }[];
-}
-
-interface WeeklyStat {
-  date: string;
-  duration: number;
-  calories: number;
-  workouts: number;
-}
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { useWorkout } from '../hooks/useWorkout';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard: React.FC = () => {
-  const [workoutStats, setWorkoutStats] = useState<WorkoutStat | null>(null);
-  const [weeklyStats, setWeeklyStats] = useState<WeeklyStat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { user } = useAuth();
+  const { workouts, workoutTypes, fetchWorkouts, fetchWorkoutTypes } = useWorkout();
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [typeDistribution, setTypeDistribution] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [workoutRes, weeklyRes] = await Promise.all([
-          statsAPI.getWorkoutStats(),
-          statsAPI.getWeeklyStats()
-        ]);
+    fetchWorkouts();
+    fetchWorkoutTypes();
+  }, [fetchWorkouts, fetchWorkoutTypes]);
+
+  // Calculate weekly data for chart
+  useEffect(() => {
+    if (workouts.length > 0) {
+      // Generate last 7 days data
+      const days = [];
+      const today = new Date();
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateString = date.toISOString().split('T')[0];
         
-        setWorkoutStats(workoutRes.data as WorkoutStat);
-        setWeeklyStats(weeklyRes.data as WeeklyStat[]);
-      } catch (err) {
-        setError('获取数据失败');
-      } finally {
-        setLoading(false);
+        const dayWorkouts = workouts.filter((w: any) => 
+          w.startTime.startsWith(dateString)
+        );
+        
+        const totalCalories = dayWorkouts.reduce((sum: number, w: any) => sum + w.caloriesBurned, 0);
+        const totalDuration = dayWorkouts.reduce((sum: number, w: any) => sum + w.durationMinutes, 0);
+        
+        days.push({
+          date: dateString,
+          calories: totalCalories,
+          duration: totalDuration,
+          count: dayWorkouts.length
+        });
       }
-    };
+      
+      setWeeklyData(days);
+    }
+  }, [workouts]);
 
-    fetchData();
-  }, []);
+  // Calculate workout type distribution
+  useEffect(() => {
+    if (workouts.length > 0 && workoutTypes.length > 0) {
+      const typeMap: Record<number, { name: string; count: number; color: string }> = {};
+      
+      // Initialize with all types
+      workoutTypes.forEach((type: any) => {
+        typeMap[type.id] = {
+          name: type.name,
+          count: 0,
+          color: '#' + Math.floor(Math.random()*16777215).toString(16)
+        };
+      });
+      
+      // Count workouts by type
+      workouts.forEach((workout: any) => {
+        if (typeMap[workout.workoutTypeId]) {
+          typeMap[workout.workoutTypeId].count++;
+        }
+      });
+      
+      setTypeDistribution(Object.values(typeMap));
+    }
+  }, [workouts, workoutTypes]);
 
-  if (loading) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-6xl mb-4">🔄</div>
-        <p className="text-xl text-gray-600">加载中...</p>
-      </div>
-    );
-  }
+  // Get recent workouts
+  const recentWorkouts = [...workouts]
+    .sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+    .slice(0, 5);
 
-  if (error) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-6xl mb-4">❌</div>
-        <p className="text-xl text-red-500">{error}</p>
-      </div>
-    );
-  }
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('zh-CN', {
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">📊 我的仪表板</h1>
-        <p className="text-gray-500 mt-2">全面了解您的健身数据</p>
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+        <h1 className="text-3xl font-bold mb-2">欢迎回来, {user?.name}!</h1>
+        <p className="text-blue-100">让我们一起继续你的健身之旅</p>
       </div>
-      
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium opacity-90">总运动次数</h3>
-            <span className="text-3xl">🏋️</span>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-100 rounded-lg mr-4">
+              <span className="text-2xl">🔥</span>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">本周卡路里</p>
+              <p className="text-2xl font-bold">
+                {weeklyData.reduce((sum, day) => sum + day.calories, 0)} <span className="text-sm font-normal">千卡</span>
+              </p>
+            </div>
           </div>
-          <p className="text-4xl font-bold">{workoutStats?.totalWorkouts || 0}</p>
-          <p className="text-xs opacity-75 mt-2">持续保持运动习惯</p>
         </div>
-        
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium opacity-90">总运动时长</h3>
-            <span className="text-3xl">⏱️</span>
+
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-lg mr-4">
+              <span className="text-2xl">⏱️</span>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">本周运动时长</p>
+              <p className="text-2xl font-bold">
+                {weeklyData.reduce((sum, day) => sum + day.duration, 0)} <span className="text-sm font-normal">分钟</span>
+              </p>
+            </div>
           </div>
-          <p className="text-4xl font-bold">{workoutStats?.totalDuration || 0}</p>
-          <p className="text-xs opacity-75 mt-2">分钟</p>
         </div>
-        
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium opacity-90">总消耗卡路里</h3>
-            <span className="text-3xl">🔥</span>
+
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-100 rounded-lg mr-4">
+              <span className="text-2xl">🏆</span>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">总运动次数</p>
+              <p className="text-2xl font-bold">{workouts.length}</p>
+            </div>
           </div>
-          <p className="text-4xl font-bold">{workoutStats?.totalCalories || 0}</p>
-          <p className="text-xs opacity-75 mt-2">卡路里</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium opacity-90">总运动距离</h3>
-            <span className="text-3xl">🏃</span>
-          </div>
-          <p className="text-4xl font-bold">{workoutStats?.totalDistance ? workoutStats.totalDistance.toFixed(2) : '0.00'}</p>
-          <p className="text-xs opacity-75 mt-2">公里</p>
         </div>
       </div>
-      
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Weekly Activity Chart */}
-        <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <div className="flex items-center mb-6">
-            <span className="text-3xl mr-3">📈</span>
-            <h3 className="text-2xl font-bold text-gray-800">本周活动</h3>
-          </div>
-          <div className="h-64 flex items-end justify-between gap-2">
-            {weeklyStats.map((stat, index) => (
-              <div key={index} className="flex flex-col items-center flex-1">
-                <div 
-                  className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg hover:from-blue-700 hover:to-blue-500 transition-all duration-300 shadow-lg"
-                  style={{ height: `${Math.max(20, stat.workouts * 30)}px` }}
-                ></div>
-                <span className="mt-3 text-xs font-semibold text-gray-700">{stat.date.substring(5)}</span>
-                <span className="text-xs text-blue-600 font-bold">{stat.workouts}次</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Workout Types Chart */}
-        <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <div className="flex items-center mb-6">
-            <span className="text-3xl mr-3">🎯</span>
-            <h3 className="text-2xl font-bold text-gray-800">运动类型分布</h3>
-          </div>
-          <div className="h-64 flex items-center justify-center">
-            {workoutStats?.workoutsByType && workoutStats.workoutsByType.length > 0 ? (
-              <div className="w-full space-y-4">
-                {workoutStats.workoutsByType.map((type, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-semibold text-gray-700 flex items-center">
-                        <span className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 mr-2"></span>
-                        {type._id}
-                      </span>
-                      <span className="text-sm font-bold text-green-600">{type.count}次</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full shadow-inner transition-all duration-500" 
-                        style={{ width: `${(type.count / (workoutStats.totalWorkouts || 1)) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center">
-                <div className="text-6xl mb-4">📋</div>
-                <p className="text-gray-400">暂无数据</p>
-              </div>
-            )}
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <h2 className="text-xl font-bold mb-6">本周活动趋势</h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(value) => formatDate(value)}
+                />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value) => [value, '千卡']}
+                  labelFormatter={(value) => formatDate(value)}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="calories" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Workout Distribution */}
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <h2 className="text-xl font-bold mb-6">运动类型分布</h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={typeDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="count"
+                  label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                >
+                  {typeDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => [value, '次']} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Workouts */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+        <h2 className="text-xl font-bold mb-6">最近运动记录</h2>
+        {recentWorkouts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">暂无运动记录</p>
+            <p className="text-gray-400 mt-2">开始记录你的第一次运动吧！</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    运动名称
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    类型
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    时长
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    消耗
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    日期
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {recentWorkouts.map((workout: any) => {
+                  const workoutType = workoutTypes.find((t: any) => t.id === workout.workoutTypeId);
+                  return (
+                    <tr key={workout.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{workout.name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {workoutType?.name || '未知'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {workout.durationMinutes} 分钟
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {workout.caloriesBurned} 千卡
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(workout.startTime)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
