@@ -61,6 +61,12 @@ export const workoutAPI = {
   import: (data: any) => api.post('/workouts/import', data), // Add import function
 };
 
+// Stats API
+export const statsAPI = {
+  getWorkoutStats: () => api.get('/stats/workouts'),
+  getWeeklyStats: () => api.get('/stats/weekly'),
+};
+
 // Health Profile API
 export const healthAPI = {
   getHealthProfile: () => api.get('/health/profile'),
