@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import OAuthButtons from '../components/OAuthButtons';
 
 interface LoginResponse {
   token: string;
@@ -92,6 +93,8 @@ const Login: React.FC = () => {
             {loading ? '🔄 登录中...' : '🚀 立即登录'}
           </button>
         </form>
+        
+        <OAuthButtons />
         
         <div className="mt-6 text-center">
           <p className="text-gray-600">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import OAuthButtons from '../components/OAuthButtons';
 
 interface RegisterResponse {
   token: string;
@@ -132,6 +133,8 @@ const Register: React.FC = () => {
             {loading ? '🔄 注册中...' : '✨ 立即注册'}
           </button>
         </form>
+        
+        <OAuthButtons />
         
         <div className="mt-6 text-center">
           <p className="text-gray-600">

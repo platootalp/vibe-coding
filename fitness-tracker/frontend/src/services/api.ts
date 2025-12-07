@@ -43,6 +43,10 @@ export const authAPI = {
   register: (userData: any) => api.post('/auth/register', userData),
   login: (credentials: any) => api.post('/auth/login', credentials),
   logout: () => api.post('/auth/logout'),
+  // OAuth APIs
+  googleLogin: (data: any) => api.post('/auth/oauth/google', data),
+  appleLogin: (data: any) => api.post('/auth/oauth/apple', data),
+  wechatLogin: (data: any) => api.post('/auth/oauth/wechat', data),
 };
 
 // User API
@@ -97,6 +101,41 @@ export const nutritionAPI = {
   getFoods: (params?: any) => api.get('/nutrition/foods', { params }),
   getMeals: () => api.get('/nutrition/meals'),
   getNutritionSummary: (params?: any) => api.get('/nutrition/summary', { params }),
+};
+
+// Social API
+export const socialAPI = {
+  getFeedPosts: (params?: any) => api.get('/social/feed', { params }),
+  getUserPosts: () => api.get('/social/posts'),
+  createPost: (postData: any) => api.post('/social/posts', postData),
+  updatePost: (id: string, postData: any) => api.put(`/social/posts/${id}`, postData),
+  deletePost: (id: string) => api.delete(`/social/posts/${id}`),
+  getPostComments: (id: string) => api.get(`/social/posts/${id}/comments`),
+  addComment: (id: string, commentData: any) => api.post(`/social/posts/${id}/comments`, commentData),
+  getUserAchievements: () => api.get('/social/achievements'),
+  getLeaderboard: () => api.get('/social/leaderboard'),
+};
+
+// Notification API
+export const notificationAPI = {
+  getNotifications: (params?: any) => api.get('/notifications', { params }),
+  markAsRead: (id: string) => api.put(`/notifications/${id}/read`),
+  markAllAsRead: () => api.put('/notifications/read-all'),
+  deleteNotification: (id: string) => api.delete(`/notifications/${id}`),
+  getUnreadCount: () => api.get('/notifications/unread-count'),
+};
+
+// Device API
+export const deviceAPI = {
+  syncDeviceData: (data: any) => api.post('/devices/sync', data),
+  getDeviceSyncHistory: () => api.get('/devices/sync'),
+  getDeviceSyncData: (deviceId: string) => api.get(`/devices/sync/${deviceId}`),
+};
+
+// Admin API
+export const adminAPI = {
+  getSystemStats: () => api.get('/admin/stats'),
+  getAllUsers: (params?: any) => api.get('/admin/users', { params }),
 };
 
 export default api;

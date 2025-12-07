@@ -5,6 +5,8 @@ import workoutReducer from './workoutSlice';
 import healthReducer from './healthSlice';
 import workoutPlanReducer from './workoutPlanSlice';
 import nutritionReducer from './nutritionSlice';
+import socialReducer from './socialSlice';
+import notificationReducer from './notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     health: healthReducer,
     workoutPlans: workoutPlanReducer,
     nutrition: nutritionReducer,
+    social: socialReducer,
+    notifications: notificationReducer,
   },
 });
 

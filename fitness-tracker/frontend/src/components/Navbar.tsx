@@ -2,11 +2,12 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/authSlice';
+import NotificationBadge from './NotificationBadge';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -29,6 +30,17 @@ const Navbar: React.FC = () => {
                 <Link to="/workout-plans" className="hover:text-blue-200 transition-colors">运动计划</Link>
                 <Link to="/health-profile" className="hover:text-blue-200 transition-colors">健康档案</Link>
                 <Link to="/nutrition" className="hover:text-blue-200 transition-colors">膳食记录</Link>
+                
+                {/* Notification badge */}
+                <Link to="/notifications" className="hover:text-blue-200 transition-colors">
+                  <NotificationBadge />
+                </Link>
+                
+                {/* Admin link for admin users */}
+                {user && user.role === 'admin' && (
+                  <Link to="/admin" className="hover:text-blue-200 transition-colors">管理员</Link>
+                )}
+                
                 <button 
                   onClick={handleLogout}
                   className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium"

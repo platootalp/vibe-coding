@@ -11,6 +11,9 @@ import Workouts from './pages/Workouts';
 import WorkoutPlans from './pages/WorkoutPlans';
 import HealthProfile from './pages/HealthProfile';
 import Nutrition from './pages/Nutrition';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminPanel from './pages/AdminPanel';
+import Notifications from './pages/Notifications';
 import './App.css';
 
 const App: React.FC = () => {
@@ -29,6 +32,9 @@ const App: React.FC = () => {
               <Route path="/workout-plans" element={<WorkoutPlans />} />
               <Route path="/health-profile" element={<HealthProfile />} />
               <Route path="/nutrition" element={<Nutrition />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/panel" element={<AdminPanel />} />
+              <Route path="/notifications" element={<Notifications />} />
             </Routes>
           </main>
         </div>

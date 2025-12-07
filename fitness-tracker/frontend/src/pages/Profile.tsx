@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../services/api';
+import DeviceSync from '../components/DeviceSync';
 
 interface UserProfile {
   _id: string;
@@ -218,6 +219,11 @@ const Profile: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+      
+      {/* Device Sync Section */}
+      <div className="mt-8">
+        <DeviceSync />
       </div>
       
       {profile && (
