@@ -18,6 +18,9 @@ const connectDB = async () => {
     const DeviceSync = (await import('../models/DeviceSync')).default;
     const UserProfile = (await import('../models/UserProfile')).default;
     const UserMetricsHistory = (await import('../models/UserMetricsHistory')).default;
+    const Workout = (await import('../models/Workout')).default;
+    const WorkoutType = (await import('../models/WorkoutType')).default;
+    const WorkoutPlan = (await import('../models/WorkoutPlan')).default;
     
     // Sync all models - use force: true to drop and recreate tables for development
     // In production, you should use migrations instead

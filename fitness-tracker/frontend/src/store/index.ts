@@ -2,14 +2,16 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
 import profileReducer from './profileSlice';
 import workoutReducer from './workoutSlice';
-import healthReducer from './healthSlice'; // Add health reducer
+import healthReducer from './healthSlice';
+import workoutPlanReducer from './workoutPlanSlice';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     profile: profileReducer,
     workouts: workoutReducer,
-    health: healthReducer, // Add health reducer
+    health: healthReducer,
+    workoutPlans: workoutPlanReducer,
   },
 });
 

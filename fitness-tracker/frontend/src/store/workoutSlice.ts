@@ -32,6 +32,13 @@ interface WorkoutState {
     startDate: string;
     endDate: string;
     isActive: boolean;
+    workoutType?: {
+      id: number;
+      name: string;
+      description: string;
+      iconUrl: string;
+      metValue: number;
+    };
   }>;
   loading: boolean;
   error: string | null;

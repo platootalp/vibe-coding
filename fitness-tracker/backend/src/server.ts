@@ -7,7 +7,8 @@ import userRoutes from './routes/userRoutes';
 import workoutRoutes from './routes/workoutRoutes';
 import deviceRoutes from './routes/deviceRoutes';
 import tenantRoutes from './routes/tenantRoutes';
-import healthRoutes from './routes/healthRoutes'; // Add health routes
+import healthRoutes from './routes/healthRoutes';
+import workoutPlanRoutes from './routes/workoutPlanRoutes';
 
 dotenv.config();
 
@@ -27,7 +28,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/devices', deviceRoutes);
 app.use('/api/tenants', tenantRoutes);
-app.use('/api/health', healthRoutes); // Add health routes
+app.use('/api/health', healthRoutes);
+app.use('/api/workout-plans', workoutPlanRoutes);
 
 // Root route
 app.get('/', (req, res) => {

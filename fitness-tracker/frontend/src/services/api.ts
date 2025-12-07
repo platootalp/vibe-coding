@@ -70,4 +70,14 @@ export const healthAPI = {
   deleteMetricsRecord: (id: string) => api.delete(`/health/metrics/${id}`),
 };
 
+// Workout Plan API
+export const workoutPlanAPI = {
+  getWorkoutPlans: (params?: any) => api.get('/workout-plans', { params }),
+  getWorkoutPlan: (id: string) => api.get(`/workout-plans/${id}`),
+  createWorkoutPlan: (planData: any) => api.post('/workout-plans', planData),
+  updateWorkoutPlan: (id: string, planData: any) => api.put(`/workout-plans/${id}`, planData),
+  deleteWorkoutPlan: (id: string) => api.delete(`/workout-plans/${id}`),
+  getWorkoutTypes: () => api.get('/workout-plans/types'),
+};
+
 export default api;

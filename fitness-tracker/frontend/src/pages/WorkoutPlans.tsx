@@ -1,340 +1,397 @@
-import React, { useState } from 'react';
-
-interface WorkoutPlan {
-  id: string;
-  name: string;
-  type: string;
-  goal: string;
-  frequency: number;
-  duration: number;
-  startDate: string;
-  endDate: string;
-}
+import React, { useState, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
+import { 
+  fetchWorkoutPlans, 
+  fetchWorkoutTypes,
+  createWorkoutPlan,
+  updateWorkoutPlan,
+  deleteWorkoutPlan,
+  clearWorkoutPlanError
+} from '../store/workoutPlanSlice';
 
 const WorkoutPlans: React.FC = () => {
-  const [plans, setPlans] = useState<WorkoutPlan[]>([
-    // Sample data - in a real app, this would come from an API
-    {
-      id: '1',
-      name: '减脂计划',
-      type: 'running',
-      goal: '每周跑步3次，每次30分钟',
-      frequency: 3,
-      duration: 30,
-      startDate: '2023-01-01',
-      endDate: '2023-03-01'
-    }
-  ]);
-  
-  const [showForm, setShowForm] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
+  const dispatch = useAppDispatch();
+  const { plans, workoutTypes, loading, error } = useAppSelector((state: any) => state.workoutPlans);
   
   // Form state
-  const [name, setName] = useState('');
-  const [type, setType] = useState('running');
-  const [goal, setGoal] = useState('');
-  const [frequency, setFrequency] = useState('3');
-  const [duration, setDuration] = useState('30');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    goal: '',
+    durationWeeks: 4,
+    workoutTypeId: '',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 4 weeks from now
+    planDetails: '{}'
+  });
 
-  const handleCreatePlan = () => {
-    setEditingPlan(null);
-    setName('');
-    setType('running');
-    setGoal('');
-    setFrequency('3');
-    setDuration('30');
-    setStartDate('');
-    setEndDate('');
-    setShowForm(true);
+  // Fetch plans and workout types on component mount
+  useEffect(() => {
+    dispatch(fetchWorkoutPlans({}));
+    dispatch(fetchWorkoutTypes());
+  }, [dispatch]);
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'durationWeeks' ? parseInt(value) || 0 : value
+    }));
   };
 
-  const handleEditPlan = (plan: WorkoutPlan) => {
-    setEditingPlan(plan);
-    setName(plan.name);
-    setType(plan.type);
-    setGoal(plan.goal);
-    setFrequency(plan.frequency.toString());
-    setDuration(plan.duration.toString());
-    setStartDate(plan.startDate);
-    setEndDate(plan.endDate);
-    setShowForm(true);
-  };
-
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newPlan: WorkoutPlan = {
-      id: editingPlan ? editingPlan.id : Date.now().toString(),
-      name,
-      type,
-      goal,
-      frequency: parseInt(frequency),
-      duration: parseInt(duration),
-      startDate,
-      endDate
-    };
-    
-    if (editingPlan) {
-      setPlans(plans.map(plan => plan.id === editingPlan.id ? newPlan : plan));
-    } else {
-      setPlans([...plans, newPlan]);
+    // Validate form
+    if (!formData.name.trim()) {
+      alert('Please enter a plan name');
+      return;
     }
     
+    if (formData.durationWeeks < 1 || formData.durationWeeks > 52) {
+      alert('Duration must be between 1 and 52 weeks');
+      return;
+    }
+    
+    // Validate dates
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+    if (start >= end) {
+      alert('End date must be after start date');
+      return;
+    }
+    
+    // Validate JSON
+    try {
+      JSON.parse(formData.planDetails);
+    } catch (err) {
+      alert('Plan details must be valid JSON');
+      return;
+    }
+    
+    // Submit form
+    const planData = {
+      ...formData,
+      workoutTypeId: formData.workoutTypeId ? parseInt(formData.workoutTypeId) : undefined,
+      planDetails: JSON.parse(formData.planDetails)
+    };
+    
+    if (editingPlanId) {
+      dispatch(updateWorkoutPlan({ id: editingPlanId, planData }));
+    } else {
+      dispatch(createWorkoutPlan(planData));
+    }
+    
+    // Reset form
     resetForm();
   };
 
+  // Reset form
+  const resetForm = () => {
+    setShowForm(false);
+    setEditingPlanId(null);
+    setFormData({
+      name: '',
+      description: '',
+      goal: '',
+      durationWeeks: 4,
+      workoutTypeId: '',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      planDetails: '{}'
+    });
+  };
+
+  // Edit plan
+  const handleEdit = (plan: any) => {
+    setEditingPlanId(plan.id);
+    setShowForm(true);
+    setFormData({
+      name: plan.name,
+      description: plan.description || '',
+      goal: plan.goal || '',
+      durationWeeks: plan.durationWeeks,
+      workoutTypeId: plan.workoutTypeId?.toString() || '',
+      startDate: plan.startDate,
+      endDate: plan.endDate,
+      planDetails: JSON.stringify(plan.planDetails || {}, null, 2)
+    });
+  };
+
+  // Delete plan
   const handleDelete = (id: string) => {
-    if (window.confirm('确定要删除这个运动计划吗？')) {
-      setPlans(plans.filter(plan => plan.id !== id));
+    if (window.confirm('Are you sure you want to delete this plan?')) {
+      dispatch(deleteWorkoutPlan(id));
     }
   };
 
-  const resetForm = () => {
-    setName('');
-    setType('running');
-    setGoal('');
-    setFrequency('3');
-    setDuration('30');
-    setStartDate('');
-    setEndDate('');
-    setEditingPlan(null);
-    setShowForm(false);
+  // Toggle plan status
+  const togglePlanStatus = (id: string, currentStatus: boolean) => {
+    dispatch(updateWorkoutPlan({ 
+      id, 
+      planData: {
+        isActive: !currentStatus 
+      }
+    }));
   };
 
-  const getTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      running: '🏃 跑步',
-      cycling: '🚴 骑行',
-      swimming: '🏊 游泳',
-      walking: '🚶 步行',
-      strength: '🏋️ 力量训练',
-      yoga: '🧘 瑜伽',
-      other: '🎯 其他'
-    };
-    return types[type] || type;
+  // Clear error
+  const handleClearError = () => {
+    dispatch(clearWorkoutPlanError());
   };
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            📋 运动计划
-          </h1>
-          <p className="text-gray-500 mt-2">制定和管理您的健身计划</p>
-        </div>
+        <h1 className="text-3xl font-bold text-gray-800">运动计划</h1>
         <button
-          onClick={handleCreatePlan}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 font-semibold"
+          onClick={() => setShowForm(!showForm)}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-6 rounded-lg hover:from-blue-600 hover:to-purple-600 font-medium shadow-md transition-all duration-200"
         >
-          ➕ 创建计划
+          {showForm ? '取消' : '创建计划'}
         </button>
       </div>
-
-      {/* Workout Plan Form */}
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={handleClearError} className="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      )}
+      
       {showForm && (
-        <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100 mb-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <span className="text-3xl mr-3">{editingPlan ? '✏️' : '✨'}</span>
-            {editingPlan ? '编辑运动计划' : '创建运动计划'}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            {editingPlanId ? '编辑运动计划' : '创建新的运动计划'}
           </h2>
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  🎯 计划名称 *
-                </label>
+                <label className="block text-gray-700 font-medium mb-2">计划名称 *</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="例如：春季减脂计划"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="例如: 4周减脂计划"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  🏃 运动类型 *
-                </label>
+                <label className="block text-gray-700 font-medium mb-2">运动类型</label>
                 <select
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  required
+                  name="workoutTypeId"
+                  value={formData.workoutTypeId}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="running">🏃 跑步</option>
-                  <option value="cycling">🚴 骑行</option>
-                  <option value="swimming">🏊 游泳</option>
-                  <option value="walking">🚶 步行</option>
-                  <option value="strength">🏋️ 力量训练</option>
-                  <option value="yoga">🧘 瑜伽</option>
-                  <option value="other">🎯 其他</option>
+                  <option value="">选择运动类型</option>
+                  {workoutTypes.map((type: any) => (
+                    <option key={type.id} value={type.id}>
+                      {type.iconUrl} {type.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  🎯 目标描述 *
-                </label>
-                <textarea
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  rows={3}
-                  placeholder="例如：每周跑步3次，每次30分钟，目标减重5公斤"
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  required
-                ></textarea>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  📅 时间安排
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-600 text-xs mb-1">开始日期</label>
-                    <input
-                      type="date"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-600 text-xs mb-1">结束日期</label>
-                    <input
-                      type="date"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  🔁 频率 (每周次数)
-                </label>
+                <label className="block text-gray-700 font-medium mb-2">持续周数</label>
                 <input
                   type="number"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="3"
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
+                  name="durationWeeks"
+                  value={formData.durationWeeks}
+                  onChange={handleInputChange}
                   min="1"
-                  max="7"
+                  max="52"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">
-                  ⏱️ 每次时长 (分钟)
-                </label>
+                <label className="block text-gray-700 font-medium mb-2">目标</label>
                 <input
-                  type="number"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="30"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  min="1"
+                  type="text"
+                  name="goal"
+                  value={formData.goal}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="例如: 减重5公斤"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">开始日期</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">结束日期</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
             
-            <div className="mt-6 flex gap-3">
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-              >
-                {editingPlan ? '✔️ 更新' : '✨ 保存'}
-              </button>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">描述</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="计划的详细描述..."
+              ></textarea>
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">计划详情 (JSON格式)</label>
+              <textarea
+                name="planDetails"
+                value={formData.planDetails}
+                onChange={handleInputChange}
+                rows={6}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                placeholder='{"weeks": [{"days": [{"workout": "跑步30分钟", "notes": "保持中等强度"}]}]}'
+              ></textarea>
+            </div>
+            
+            <div className="flex justify-end space-x-4">
               <button
                 type="button"
                 onClick={resetForm}
-                className="bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
               >
-                ❌ 取消
+                取消
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-6 rounded-lg hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 font-medium shadow-md transition-all duration-200"
+              >
+                {loading ? '保存中...' : (editingPlanId ? '更新计划' : '创建计划')}
               </button>
             </div>
           </form>
         </div>
       )}
-
-      {/* Workout Plans List */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-        {plans.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">📋</div>
-            <p className="text-gray-500 text-lg">暂无运动计划</p>
-            <p className="text-gray-400 mt-2">点击“创建计划”按钮开始制定您的健身计划吧！</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-            {plans.map((plan) => (
-              <div key={plan.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">{plan.name}</h3>
-                  <div className="flex gap-2">
+      
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">我的运动计划</h2>
+        </div>
+        
+        {plans.length > 0 ? (
+          <div className="divide-y divide-gray-200">
+            {plans.map((plan: any) => (
+              <div key={plan.id} className="p-6 hover:bg-gray-50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center">
+                      <h3 className="text-lg font-medium text-gray-900">{plan.name}</h3>
+                      {plan.workoutType && (
+                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {plan.workoutType.iconUrl} {plan.workoutType.name}
+                        </span>
+                      )}
+                      <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        plan.isActive 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {plan.isActive ? '进行中' : '已结束'}
+                      </span>
+                    </div>
+                    
+                    {plan.description && (
+                      <p className="mt-2 text-gray-600">{plan.description}</p>
+                    )}
+                    
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500">目标</p>
+                        <p className="text-gray-900">{plan.goal || '未设置'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">持续时间</p>
+                        <p className="text-gray-900">{plan.durationWeeks} 周</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">开始日期</p>
+                        <p className="text-gray-900">{new Date(plan.startDate).toLocaleDateString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">结束日期</p>
+                        <p className="text-gray-900">{new Date(plan.endDate).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
                     <button
-                      onClick={() => handleEditPlan(plan)}
-                      className="text-blue-600 hover:text-blue-900 font-semibold transition-colors duration-150"
+                      onClick={() => togglePlanStatus(plan.id, plan.isActive)}
+                      className={`px-3 py-1 rounded text-sm font-medium ${
+                        plan.isActive
+                          ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                          : 'bg-green-100 text-green-800 hover:bg-green-200'
+                      }`}
                     >
-                      ✏️
+                      {plan.isActive ? '结束' : '激活'}
+                    </button>
+                    <button
+                      onClick={() => handleEdit(plan)}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium hover:bg-blue-200"
+                    >
+                      编辑
                     </button>
                     <button
                       onClick={() => handleDelete(plan.id)}
-                      className="text-red-600 hover:text-red-900 font-semibold transition-colors duration-150"
+                      className="px-3 py-1 bg-red-100 text-red-800 rounded text-sm font-medium hover:bg-red-200"
                     >
-                      🗑️
+                      删除
                     </button>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <span className="text-gray-500 w-24 text-sm">运动类型:</span>
-                    <span className="font-medium">{getTypeLabel(plan.type)}</span>
+                {plan.planDetails && Object.keys(plan.planDetails).length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500">计划详情:</p>
+                    <pre className="mt-2 p-4 bg-gray-100 rounded text-sm overflow-x-auto">
+                      {JSON.stringify(plan.planDetails, null, 2)}
+                    </pre>
                   </div>
-                  
-                  <div className="flex items-center">
-                    <span className="text-gray-500 w-24 text-sm">目标:</span>
-                    <span className="font-medium text-sm">{plan.goal}</span>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <span className="text-gray-500 w-24 text-sm">频率:</span>
-                    <span className="font-medium">每周 {plan.frequency} 次</span>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <span className="text-gray-500 w-24 text-sm">时长:</span>
-                    <span className="font-medium">每次 {plan.duration} 分钟</span>
-                  </div>
-                  
-                  {(plan.startDate || plan.endDate) && (
-                    <div className="flex items-center">
-                      <span className="text-gray-500 w-24 text-sm">时间:</span>
-                      <span className="font-medium text-sm">
-                        {plan.startDate && `${plan.startDate} 至 `}
-                        {plan.endDate || '未指定'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <span>计划ID: {plan.id}</span>
-                  </div>
-                </div>
+                )}
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <p className="text-gray-500">暂无运动计划</p>
+            <p className="text-gray-400 text-sm mt-1">创建您的第一个运动计划开始健身之旅</p>
           </div>
         )}
       </div>
