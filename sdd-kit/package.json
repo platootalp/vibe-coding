@@ -1,0 +1,30 @@
+{
+  "name": "sdd-kit",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "dev:server": "pnpm --filter @sdd/server dev",
+    "dev:web": "pnpm --filter @sdd/web dev",
+    "dev:cli": "pnpm --filter @sdd/cli dev",
+    "start": "pnpm --filter @sdd/server start"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.2"
+  }
+}

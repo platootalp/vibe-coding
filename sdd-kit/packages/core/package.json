@@ -1,0 +1,23 @@
+{
+  "name": "@sdd/core",
+  "version": "0.1.0",
+  "description": "核心规范驱动开发引擎",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "dev": "ts-node src/index.ts",
+    "lint": "echo \"No lint configured yet\"",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "sdd",
+    "architecture",
+    "planning"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

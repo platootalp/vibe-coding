@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # MySQL数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: fitness-tracker-mysql-cn
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fitnessTracker
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: fitnesspass
+    volumes:
+      - mysql_data_cn:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 后端API服务（开发模式）
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: fitness-tracker-backend-cn
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: fitnessuser
+      MYSQL_PASSWORD: fitnesspass
+      MYSQL_DATABASE: fitnessTracker
+      JWT_SECRET: fitnessTrackerSecretKey123
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # 前端React应用（开发模式）
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: fitness-tracker-frontend-cn
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+# 定义数据卷
+volumes:
+  mysql_data_cn:

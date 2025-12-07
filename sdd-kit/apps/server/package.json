@@ -1,0 +1,17 @@
+{
+  "name": "@sdd/server",
+  "version": "0.1.0",
+  "description": "SDD Kit 后端 API",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@sdd/core": "workspace:*",
+    "fastify": "^4.27.2"
+  }
+}
