@@ -1,61 +1,73 @@
 import axios from 'axios';
 
-// Create axios instance
+const API_BASE_URL = 'http://localhost:3001/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests
+// Add a request interceptor to include the token in headers
 api.interceptors.request.use(
-  (config: any) => {
+  (config) => {
     const token = localStorage.getItem('token');
     if (token && config.headers) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error: any) => {
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Token expired or invalid, redirect to login
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
 
 // Auth API
 export const authAPI = {
-  register: (data: { name: string; email: string; password: string }) =>
-    api.post('/auth/register', data),
-  login: (data: { email: string; password: string }) =>
-    api.post('/auth/login', data),
+  register: (userData: any) => api.post('/auth/register', userData),
+  login: (credentials: any) => api.post('/auth/login', credentials),
+  logout: () => api.post('/auth/logout'),
 };
 
 // User API
 export const userAPI = {
   getProfile: () => api.get('/users/profile'),
-  updateProfile: (data: Partial<{
-    name: string;
-    email: string;
-    age: number;
-    height: number;
-    weight: number;
-    gender: string;
-  }>) => api.put('/users/profile', data),
+  updateProfile: (userData: any) => api.put('/users/profile', userData),
 };
 
 // Workout API
 export const workoutAPI = {
-  getAll: () => api.get('/workouts'),
-  getById: (id: string) => api.get(`/workouts/${id}`),
-  create: (data: any) => api.post('/workouts', data),
-  update: (id: string, data: any) => api.put(`/workouts/${id}`, data),
-  delete: (id: string) => api.delete(`/workouts/${id}`),
+  getWorkouts: () => api.get('/workouts'),
+  getWorkout: (id: string) => api.get(`/workouts/${id}`),
+  createWorkout: (workoutData: any) => api.post('/workouts', workoutData),
+  updateWorkout: (id: string, workoutData: any) => api.put(`/workouts/${id}`, workoutData),
+  deleteWorkout: (id: string) => api.delete(`/workouts/${id}`),
 };
 
-// Stats API
-export const statsAPI = {
-  getWorkoutStats: () => api.get('/stats/workouts'),
-  getWeeklyStats: () => api.get('/stats/weekly'),
+// Health Profile API
+export const healthAPI = {
+  getHealthProfile: () => api.get('/health/profile'),
+  updateHealthProfile: (profileData: any) => api.put('/health/profile', profileData),
+  getMetricsHistory: (params?: any) => api.get('/health/metrics-history', { params }),
+  addMetricsRecord: (metricsData: any) => api.post('/health/metrics', metricsData),
+  updateMetricsRecord: (id: string, metricsData: any) => api.put(`/health/metrics/${id}`, metricsData),
+  deleteMetricsRecord: (id: string) => api.delete(`/health/metrics/${id}`),
 };
 
 export default api;

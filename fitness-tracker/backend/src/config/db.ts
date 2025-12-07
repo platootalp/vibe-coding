@@ -1,26 +1,10 @@
-import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import sequelize from './sequelize';
+
+// Import seed function
+import { seedDatabase } from '../utils/seedData';
 
 dotenv.config();
-
-// Create Sequelize instance
-const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE || 'fitnessTracker',
-  process.env.MYSQL_USER || 'root',
-  process.env.MYSQL_PASSWORD || '',
-  {
-    host: process.env.MYSQL_HOST || 'localhost',
-    port: parseInt(process.env.MYSQL_PORT || '3306'),
-    dialect: 'mysql',
-    logging: false, // Set to console.log to see SQL queries
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    }
-  }
-);
 
 // Test database connection
 const connectDB = async () => {
@@ -28,9 +12,20 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('MySQL Database connected successfully.');
     
-    // Sync all models
-    await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
+    // Import all models after sequelize instance is created to avoid circular dependencies
+    const User = (await import('../models/User')).default;
+    const Tenant = (await import('../models/Tenant')).default;
+    const DeviceSync = (await import('../models/DeviceSync')).default;
+    const UserProfile = (await import('../models/UserProfile')).default;
+    const UserMetricsHistory = (await import('../models/UserMetricsHistory')).default;
+    
+    // Sync all models - use force: true to drop and recreate tables for development
+    // In production, you should use migrations instead
+    await sequelize.sync({ force: true }); // Use { force: true } to drop and recreate tables
     console.log('All models were synchronized successfully.');
+    
+    // Seed database with default data
+    await seedDatabase();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
     process.exit(1);

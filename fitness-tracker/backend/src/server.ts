@@ -1,20 +1,21 @@
 import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/db';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import workoutRoutes from './routes/workoutRoutes';
-import statsRoutes from './routes/statsRoutes';
+import deviceRoutes from './routes/deviceRoutes';
+import tenantRoutes from './routes/tenantRoutes';
+import healthRoutes from './routes/healthRoutes'; // Add health routes
 
-// Load environment variables
 dotenv.config();
-
-// Connect to database
-connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Connect to database
+connectDB();
 
 // Middleware
 app.use(cors());
@@ -24,10 +25,13 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/workouts', workoutRoutes);
-app.use('/api/stats', statsRoutes);
+app.use('/api/devices', deviceRoutes);
+app.use('/api/tenants', tenantRoutes);
+app.use('/api/health', healthRoutes); // Add health routes
 
+// Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'Fitness Tracker API' });
+  res.send('Fitness Tracker API is running...');
 });
 
 // Start server

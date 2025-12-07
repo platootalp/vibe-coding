@@ -1,13 +1,17 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import bcrypt from 'bcryptjs';
-import { sequelize } from '../config/db';
+import sequelize from '../config/sequelize';
 
 // Define the attributes for the User model
 interface UserAttributes {
   id: number;
+  tenantId: number;
   name: string;
   email: string;
   password: string;
+  role: 'user' | 'coach' | 'admin';
+  oauthProvider?: 'google' | 'apple' | 'wechat';
+  oauthId?: string;
   age?: number;
   height?: number;
   weight?: number;
@@ -17,14 +21,18 @@ interface UserAttributes {
 }
 
 // Define the creation attributes (id and timestamps are auto-generated)
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt' | 'age' | 'height' | 'weight' | 'gender'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt' | 'age' | 'height' | 'weight' | 'gender' | 'oauthProvider' | 'oauthId'> {}
 
 // Define the User model class
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
+  public tenantId!: number;
   public name!: string;
   public email!: string;
   public password!: string;
+  public role!: 'user' | 'coach' | 'admin';
+  public oauthProvider?: 'google' | 'apple' | 'wechat';
+  public oauthId?: string;
   public age?: number;
   public height?: number;
   public weight?: number;
@@ -46,6 +54,16 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    tenantId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: 'tenants',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -64,6 +82,19 @@ User.init(
       validate: {
         len: [6, 100],
       },
+    },
+    role: {
+      type: DataTypes.ENUM('user', 'coach', 'admin'),
+      allowNull: false,
+      defaultValue: 'user',
+    },
+    oauthProvider: {
+      type: DataTypes.ENUM('google', 'apple', 'wechat'),
+      allowNull: true,
+    },
+    oauthId: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
     age: {
       type: DataTypes.TINYINT.UNSIGNED,
@@ -95,7 +126,7 @@ User.init(
     },
   },
   {
-    sequelize,
+    sequelize: sequelize, // Explicitly pass the sequelize instance
     tableName: 'users',
     timestamps: true,
     hooks: {
