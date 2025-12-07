@@ -80,4 +80,16 @@ export const workoutPlanAPI = {
   getWorkoutTypes: () => api.get('/workout-plans/types'),
 };
 
+// Nutrition API
+export const nutritionAPI = {
+  getNutritionLogs: (params?: any) => api.get('/nutrition/logs', { params }),
+  getNutritionLog: (id: string) => api.get(`/nutrition/logs/${id}`),
+  createNutritionLog: (logData: any) => api.post('/nutrition/logs', logData),
+  updateNutritionLog: (id: string, logData: any) => api.put(`/nutrition/logs/${id}`, logData),
+  deleteNutritionLog: (id: string) => api.delete(`/nutrition/logs/${id}`),
+  getFoods: (params?: any) => api.get('/nutrition/foods', { params }),
+  getMeals: () => api.get('/nutrition/meals'),
+  getNutritionSummary: (params?: any) => api.get('/nutrition/summary', { params }),
+};
+
 export default api;

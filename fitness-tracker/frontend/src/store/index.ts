@@ -4,6 +4,7 @@ import profileReducer from './profileSlice';
 import workoutReducer from './workoutSlice';
 import healthReducer from './healthSlice';
 import workoutPlanReducer from './workoutPlanSlice';
+import nutritionReducer from './nutritionSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     workouts: workoutReducer,
     health: healthReducer,
     workoutPlans: workoutPlanReducer,
+    nutrition: nutritionReducer,
   },
 });
 

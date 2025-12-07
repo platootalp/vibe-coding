@@ -27,7 +27,8 @@ const Navbar: React.FC = () => {
                 <Link to="/profile" className="hover:text-blue-200 transition-colors">个人资料</Link>
                 <Link to="/workouts" className="hover:text-blue-200 transition-colors">运动记录</Link>
                 <Link to="/workout-plans" className="hover:text-blue-200 transition-colors">运动计划</Link>
-                <Link to="/health-profile" className="hover:text-blue-200 transition-colors">健康档案</Link> {/* Add Health Profile link */}
+                <Link to="/health-profile" className="hover:text-blue-200 transition-colors">健康档案</Link>
+                <Link to="/nutrition" className="hover:text-blue-200 transition-colors">膳食记录</Link>
                 <button 
                   onClick={handleLogout}
                   className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors font-medium"

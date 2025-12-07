@@ -9,7 +9,8 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Workouts from './pages/Workouts';
 import WorkoutPlans from './pages/WorkoutPlans';
-import HealthProfile from './pages/HealthProfile'; // Add HealthProfile import
+import HealthProfile from './pages/HealthProfile';
+import Nutrition from './pages/Nutrition';
 import './App.css';
 
 const App: React.FC = () => {
@@ -26,7 +27,8 @@ const App: React.FC = () => {
               <Route path="/profile" element={<Profile />} />
               <Route path="/workouts" element={<Workouts />} />
               <Route path="/workout-plans" element={<WorkoutPlans />} />
-              <Route path="/health-profile" element={<HealthProfile />} /> {/* Add HealthProfile route */}
+              <Route path="/health-profile" element={<HealthProfile />} />
+              <Route path="/nutrition" element={<Nutrition />} />
             </Routes>
           </main>
         </div>

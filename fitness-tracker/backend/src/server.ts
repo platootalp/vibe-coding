@@ -9,6 +9,7 @@ import deviceRoutes from './routes/deviceRoutes';
 import tenantRoutes from './routes/tenantRoutes';
 import healthRoutes from './routes/healthRoutes';
 import workoutPlanRoutes from './routes/workoutPlanRoutes';
+import nutritionRoutes from './routes/nutritionRoutes';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use('/api/devices', deviceRoutes);
 app.use('/api/tenants', tenantRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/workout-plans', workoutPlanRoutes);
+app.use('/api/nutrition', nutritionRoutes);
 
 // Root route
 app.get('/', (req, res) => {
