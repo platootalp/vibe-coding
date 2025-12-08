@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
 
   // Calculate hotspot data (peak exercise hours)
   useEffect(() => {
-    if (workouts.length > 0) {
+    if (workouts && workouts.length > 0) {
       // Generate data for 24 hours
       const hours = Array.from({ length: 24 }, (_, i) => i);
       const hourCounts = hours.map(hour => {
@@ -29,30 +29,30 @@ const Dashboard: React.FC = () => {
         }).length;
         return { hour, count };
       });
-      
+
       setHotspotData(hourCounts);
     }
   }, [workouts]);
 
   // Calculate prediction data (calories trend)
   useEffect(() => {
-    if (weeklyStats.length > 0) {
+    if (weeklyStats && weeklyStats.length > 0) {
       // Simple linear regression for prediction
       const dataWithIndex = weeklyStats.map((item, index) => ({
         ...item,
         index
       }));
-      
+
       // Calculate trend line
       const n = dataWithIndex.length;
       const sumX = dataWithIndex.reduce((sum, item) => sum + item.index, 0);
       const sumY = dataWithIndex.reduce((sum, item) => sum + item.calories, 0);
       const sumXY = dataWithIndex.reduce((sum, item) => sum + item.index * item.calories, 0);
       const sumXX = dataWithIndex.reduce((sum, item) => sum + item.index * item.index, 0);
-      
+
       const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
       const intercept = (sumY - slope * sumX) / n;
-      
+
       // Predict next 3 days
       const predictions = [];
       for (let i = 0; i < 3; i++) {
@@ -61,20 +61,20 @@ const Dashboard: React.FC = () => {
         const futureDate = new Date();
         futureDate.setDate(futureDate.getDate() + i);
         const dateStr = futureDate.toISOString().split('T')[0];
-        
+
         predictions.push({
           date: dateStr,
           calories: predictedCalories,
           isPrediction: true
         });
       }
-      
+
       // Combine actual and predicted data
       const combinedData = [
         ...weeklyStats.map(item => ({ ...item, isPrediction: false })),
         ...predictions
       ];
-      
+
       setPredictionData(combinedData);
     }
   }, [weeklyStats]);
@@ -90,7 +90,7 @@ const Dashboard: React.FC = () => {
         { name: '王五', calories: workoutStats.totalCalories * 0.8, rank: 4 },
         { name: '赵六', calories: workoutStats.totalCalories * 0.75, rank: 5 },
       ];
-      
+
       setRankingData(mockRanking);
     }
   }, [workoutStats]);
@@ -200,22 +200,22 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={weeklyStats}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tickFormatter={(value) => formatDate(value)}
                 />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [value, '千卡']}
                   labelFormatter={(value) => formatDate(value)}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="calories" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="calories"
+                  stroke="#3b82f6"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  activeDot={{ r: 6 }} 
+                  activeDot={{ r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -256,18 +256,18 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hotspotData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis 
-                  dataKey="hour" 
+                <XAxis
+                  dataKey="hour"
                   tickFormatter={formatTime}
                 />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [value, '次']}
                   labelFormatter={formatTime}
                 />
-                <Bar 
-                  dataKey="count" 
-                  fill="#8b5cf6" 
+                <Bar
+                  dataKey="count"
+                  fill="#8b5cf6"
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -281,19 +281,19 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={predictionData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tickFormatter={(value) => formatDate(value)}
                 />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [value, '千卡']}
                   labelFormatter={(value) => formatDate(value)}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="calories" 
-                  stroke="#10b981" 
+                <Line
+                  type="monotone"
+                  dataKey="calories"
+                  stroke="#10b981"
                   strokeWidth={2}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
@@ -359,7 +359,7 @@ const Dashboard: React.FC = () => {
       {/* Recent Workouts */}
       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
         <h2 className="text-xl font-bold mb-6">最近运动记录</h2>
-        {workouts.length === 0 ? (
+        {workouts && workouts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">暂无运动记录</p>
             <p className="text-gray-400 mt-2">开始记录你的第一次运动吧！</p>
@@ -387,7 +387,7 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {[...workouts]
+                {workouts && [...workouts]
                   .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .slice(0, 5)
                   .map((workout: any) => {

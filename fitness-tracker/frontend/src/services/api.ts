@@ -5,7 +5,9 @@ import * as mockAPIs from '../mock/mockApi';
 // Determine if we should use mock APIs (in development)
 // Fix for browser environment - check if process exists
 const IS_BROWSER = typeof process === 'undefined' || !process.env;
-const USE_MOCK_APIS = !IS_BROWSER && process.env.NODE_ENV === 'development' && process.env.REACT_APP_USE_MOCK_APIS === 'true';
+const USE_MOCK_APIS = IS_BROWSER ?
+  import.meta.env.VITE_USE_MOCK_APIS === 'true' :
+  process.env.NODE_ENV === 'development' && process.env.REACT_APP_USE_MOCK_APIS === 'true';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -79,7 +81,16 @@ export const workoutAPI = USE_MOCK_APIS ? mockAPIs.mockWorkoutAPI : {
 };
 
 // Stats API
-export const statsAPI = {
+export const statsAPI = USE_MOCK_APIS ? {
+  getWorkoutStats: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  getWeeklyStats: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+} : {
   getWorkoutStats: () => api.get('/stats/workouts'),
   getWeeklyStats: () => api.get('/stats/weekly'),
 };
@@ -95,7 +106,32 @@ export const healthAPI = USE_MOCK_APIS ? mockAPIs.mockHealthAPI : {
 };
 
 // Workout Plan API
-export const workoutPlanAPI = {
+export const workoutPlanAPI = USE_MOCK_APIS ? {
+  getWorkoutPlans: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  getWorkoutPlan: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  createWorkoutPlan: async (planData: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: planData };
+  },
+  updateWorkoutPlan: async (id: string, planData: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: planData };
+  },
+  deleteWorkoutPlan: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  getWorkoutTypes: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+} : {
   getWorkoutPlans: (params?: any) => api.get('/workout-plans', { params }),
   getWorkoutPlan: (id: string) => api.get(`/workout-plans/${id}`),
   createWorkoutPlan: (planData: any) => api.post('/workout-plans', planData),
@@ -117,7 +153,44 @@ export const nutritionAPI = USE_MOCK_APIS ? mockAPIs.mockNutritionAPI : {
 };
 
 // Social API
-export const socialAPI = {
+export const socialAPI = USE_MOCK_APIS ? {
+  getFeedPosts: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  getUserPosts: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  createPost: async (postData: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: postData };
+  },
+  updatePost: async (id: string, postData: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: postData };
+  },
+  deletePost: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  getPostComments: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  addComment: async (id: string, commentData: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: commentData };
+  },
+  getUserAchievements: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  getLeaderboard: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+} : {
   getFeedPosts: (params?: any) => api.get('/social/feed', { params }),
   getUserPosts: () => api.get('/social/posts'),
   createPost: (postData: any) => api.post('/social/posts', postData),
@@ -130,7 +203,28 @@ export const socialAPI = {
 };
 
 // Notification API
-export const notificationAPI = {
+export const notificationAPI = USE_MOCK_APIS ? {
+  getNotifications: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  markAsRead: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  markAllAsRead: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  deleteNotification: async (id: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  getUnreadCount: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: { count: 0 } };
+  },
+} : {
   getNotifications: (params?: any) => api.get('/notifications', { params }),
   markAsRead: (id: string) => api.put(`/notifications/${id}/read`),
   markAllAsRead: () => api.put('/notifications/read-all'),
@@ -139,14 +233,36 @@ export const notificationAPI = {
 };
 
 // Device API
-export const deviceAPI = {
+export const deviceAPI = USE_MOCK_APIS ? {
+  syncDeviceData: async (data: any) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data };
+  },
+  getDeviceSyncHistory: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+  getDeviceSyncData: async (deviceId: string) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+} : {
   syncDeviceData: (data: any) => api.post('/devices/sync', data),
   getDeviceSyncHistory: () => api.get('/devices/sync'),
   getDeviceSyncData: (deviceId: string) => api.get(`/devices/sync/${deviceId}`),
 };
 
 // Admin API
-export const adminAPI = {
+export const adminAPI = USE_MOCK_APIS ? {
+  getSystemStats: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: {} };
+  },
+  getAllUsers: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { data: [] };
+  },
+} : {
   getSystemStats: () => api.get('/admin/stats'),
   getAllUsers: (params?: any) => api.get('/admin/users', { params }),
 };
