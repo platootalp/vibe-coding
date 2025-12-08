@@ -1,4 +1,11 @@
 import axios from 'axios';
+// Import mock APIs
+import * as mockAPIs from '../mock/mockApi';
+
+// Determine if we should use mock APIs (in development)
+// Fix for browser environment - check if process exists
+const IS_BROWSER = typeof process === 'undefined' || !process.env;
+const USE_MOCK_APIS = !IS_BROWSER && process.env.NODE_ENV === 'development' && process.env.REACT_APP_USE_MOCK_APIS === 'true';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -39,7 +46,7 @@ api.interceptors.response.use(
 );
 
 // Auth API
-export const authAPI = {
+export const authAPI = USE_MOCK_APIS ? mockAPIs.mockAuthAPI : {
   register: (userData: any) => api.post('/auth/register', userData),
   login: (credentials: any) => api.post('/auth/login', credentials),
   logout: () => api.post('/auth/logout'),
@@ -50,19 +57,25 @@ export const authAPI = {
 };
 
 // User API
-export const userAPI = {
+export const userAPI = USE_MOCK_APIS ? mockAPIs.mockUserAPI : {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (userData: any) => api.put('/users/profile', userData),
 };
 
 // Workout API
-export const workoutAPI = {
+export const workoutAPI = USE_MOCK_APIS ? mockAPIs.mockWorkoutAPI : {
   getAll: () => api.get('/workouts'),
   getById: (id: string) => api.get(`/workouts/${id}`),
   create: (data: any) => api.post('/workouts', data),
   update: (id: string, data: any) => api.put(`/workouts/${id}`, data),
   delete: (id: string) => api.delete(`/workouts/${id}`),
   import: (data: any) => api.post('/workouts/import', data), // Add import function
+  // Add missing methods
+  getTypes: () => api.get('/workouts/types'),
+  getPlans: () => api.get('/workouts/plans'),
+  createPlan: (planData: any) => api.post('/workouts/plans', planData),
+  updatePlan: (id: string, planData: any) => api.put(`/workouts/plans/${id}`, planData),
+  deletePlan: (id: string) => api.delete(`/workouts/plans/${id}`),
 };
 
 // Stats API
@@ -72,7 +85,7 @@ export const statsAPI = {
 };
 
 // Health Profile API
-export const healthAPI = {
+export const healthAPI = USE_MOCK_APIS ? mockAPIs.mockHealthAPI : {
   getHealthProfile: () => api.get('/health/profile'),
   updateHealthProfile: (profileData: any) => api.put('/health/profile', profileData),
   getMetricsHistory: (params?: any) => api.get('/health/metrics-history', { params }),
@@ -92,7 +105,7 @@ export const workoutPlanAPI = {
 };
 
 // Nutrition API
-export const nutritionAPI = {
+export const nutritionAPI = USE_MOCK_APIS ? mockAPIs.mockNutritionAPI : {
   getNutritionLogs: (params?: any) => api.get('/nutrition/logs', { params }),
   getNutritionLog: (id: string) => api.get(`/nutrition/logs/${id}`),
   createNutritionLog: (logData: any) => api.post('/nutrition/logs', logData),

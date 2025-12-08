@@ -23,7 +23,7 @@ const DeviceSync: React.FC = () => {
     try {
       setLoading(true);
       const response = await deviceAPI.getDeviceSyncHistory();
-      setDevices(response.data);
+      setDevices(response.data as DeviceSyncData[]);
     } catch (err: any) {
       setError('获取设备同步历史失败');
       console.error(err);
@@ -46,12 +46,12 @@ const DeviceSync: React.FC = () => {
           calories: Math.floor(Math.random() * 500) + 200
         }
       };
-      
+
       await deviceAPI.syncDeviceData(fakeDeviceData);
-      
+
       // Refresh the device list
       fetchDeviceSyncHistory();
-      
+
       alert('设备数据同步成功！');
     } catch (err: any) {
       setError('设备同步失败');

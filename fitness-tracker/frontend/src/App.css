@@ -1,19 +1,17 @@
+/* Removed old CSS classes that conflict with Tailwind CSS */
+
 .App {
-  text-align: center;
+  /* Removed conflicting styles */
 }
 
 .App-header {
-  background-color: #282c34;
-  padding: 20px;
-  color: white;
+  /* Removed conflicting styles */
 }
 
 .App-header h1 {
-  margin: 0;
-  font-size: 2rem;
+  /* Removed conflicting styles */
 }
 
 .App-header p {
-  font-size: 1.2rem;
-  color: #ccc;
+  /* Removed conflicting styles */
 }

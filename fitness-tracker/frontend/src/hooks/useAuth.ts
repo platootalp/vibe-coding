@@ -21,14 +21,14 @@ export const useAuth = () => {
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await authAPI.login(credentials);
-      const { token, user } = response.data;
-      
+      const { token, user } = response.data as { token: string; user: any };
+
       // Store token in localStorage
       localStorage.setItem('token', token);
-      
+
       // Dispatch login success action
       dispatch(loginSuccess({ token, user }));
-      
+
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.response?.data?.message || 'Login failed' };
@@ -38,14 +38,14 @@ export const useAuth = () => {
   const register = async (data: RegisterData) => {
     try {
       const response = await authAPI.register(data);
-      const { token, user } = response.data;
-      
+      const { token, user } = response.data as { token: string; user: any };
+
       // Store token in localStorage
       localStorage.setItem('token', token);
-      
+
       // Dispatch login success action
       dispatch(loginSuccess({ token, user }));
-      
+
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.response?.data?.message || 'Registration failed' };
@@ -55,7 +55,7 @@ export const useAuth = () => {
   const logoutUser = () => {
     // Remove token from localStorage
     localStorage.removeItem('token');
-    
+
     // Dispatch logout action
     dispatch(logout());
   };

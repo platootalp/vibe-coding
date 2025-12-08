@@ -1,17 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { 
-  setWorkouts, 
-  setWorkoutTypes, 
-  setPlans, 
-  addWorkout, 
-  updateWorkout, 
-  removeWorkout, 
-  addPlan, 
-  updatePlan, 
-  removePlan, 
-  setLoading, 
-  setError 
+import {
+  setWorkouts,
+  setWorkoutTypes,
+  setPlans,
+  addWorkout,
+  updateWorkout,
+  removeWorkout,
+  addPlan,
+  updatePlan,
+  removePlan,
+  setLoading,
+  setError
 } from '../store/workoutSlice';
 import { workoutAPI } from '../services/api';
 
@@ -23,7 +23,7 @@ export const useWorkout = () => {
     dispatch(setLoading(true));
     try {
       const response = await workoutAPI.getAll();
-      dispatch(setWorkouts(response.data));
+      dispatch(setWorkouts(response.data as any[]));
     } catch (err: any) {
       dispatch(setError(err.response?.data?.message || 'Failed to fetch workouts'));
     } finally {
@@ -34,7 +34,7 @@ export const useWorkout = () => {
   const fetchWorkoutTypes = async () => {
     try {
       const response = await workoutAPI.getTypes();
-      dispatch(setWorkoutTypes(response.data));
+      dispatch(setWorkoutTypes(response.data as any[]));
     } catch (err: any) {
       dispatch(setError(err.response?.data?.message || 'Failed to fetch workout types'));
     }
@@ -44,7 +44,7 @@ export const useWorkout = () => {
     dispatch(setLoading(true));
     try {
       const response = await workoutAPI.getPlans();
-      dispatch(setPlans(response.data));
+      dispatch(setPlans(response.data as any[]));
     } catch (err: any) {
       dispatch(setError(err.response?.data?.message || 'Failed to fetch plans'));
     } finally {
@@ -55,7 +55,7 @@ export const useWorkout = () => {
   const createWorkout = async (workoutData: any) => {
     try {
       const response = await workoutAPI.create(workoutData);
-      dispatch(addWorkout(response.data));
+      dispatch(addWorkout(response.data as any));
       return { success: true, data: response.data };
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to create workout';
@@ -67,7 +67,7 @@ export const useWorkout = () => {
   const updateWorkoutRecord = async (id: string, workoutData: any) => {
     try {
       const response = await workoutAPI.update(id, workoutData);
-      dispatch(updateWorkout(response.data));
+      dispatch(updateWorkout(response.data as any));
       return { success: true, data: response.data };
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to update workout';
@@ -91,7 +91,7 @@ export const useWorkout = () => {
   const createPlan = async (planData: any) => {
     try {
       const response = await workoutAPI.createPlan(planData);
-      dispatch(addPlan(response.data));
+      dispatch(addPlan(response.data as any));
       return { success: true, data: response.data };
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to create plan';
@@ -103,7 +103,7 @@ export const useWorkout = () => {
   const updatePlanRecord = async (id: string, planData: any) => {
     try {
       const response = await workoutAPI.updatePlan(id, planData);
-      dispatch(updatePlan(response.data));
+      dispatch(updatePlan(response.data as any));
       return { success: true, data: response.data };
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to update plan';
