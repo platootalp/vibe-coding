@@ -1,0 +1,57 @@
+/* App-specific styles */
+.app-container {
+  background-color: #f0f2f5;
+}
+
+/* 页面特定样式 */
+.app-management-page .ant-card,
+.prompt-management-page .ant-card,
+.knowledge-base-management-page .ant-card,
+.debug-page .ant-card,
+.monitoring-page .ant-card {
+  margin-bottom: 16px;
+}
+
+/* 提示词编辑器样式 */
+.prompt-editor {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 8px;
+  background-color: #fafafa;
+  min-height: 200px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.prompt-editor:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 工作流编辑器样式 */
+.workflow-editor {
+  height: 600px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+/* 调试日志样式 */
+.debug-log {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.debug-log-debug { color: #1890ff; }
+.debug-log-info { color: #52c41a; }
+.debug-log-warn { color: #faad14; }
+.debug-log-error { color: #f5222d; }
+
+/* 监控图表样式 */
+.monitor-chart {
+  height: 400px;
+  margin: 16px 0;
+}

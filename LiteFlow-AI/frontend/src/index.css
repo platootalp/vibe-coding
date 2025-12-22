@@ -1,0 +1,231 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: #213547;
+  background-color: #f0f2f5;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #1890ff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #40a9ff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+#root {
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5em;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 2em;
+  line-height: 1.3;
+  margin-bottom: 0.8rem;
+}
+
+h3 {
+  font-size: 1.5em;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: fixed;
+    z-index: 10;
+    height: 100vh;
+  }
+
+  .ant-layout-content {
+    margin-left: 0 !important;
+    padding: 16px !important;
+  }
+
+  .ant-layout-header {
+    padding: 0 16px !important;
+  }
+
+  .ant-table {
+    font-size: 12px;
+    overflow-x: auto;
+  }
+
+  .ant-card {
+    margin-bottom: 16px;
+  }
+
+  /* 监控页面响应式优化 */
+  .ant-tabs-tab {
+    font-size: 12px;
+    padding: 8px 12px !important;
+  }
+
+  .ant-tabs-content {
+    padding-top: 16px;
+  }
+
+  /* 调试页面响应式优化 */
+  .ant-collapse-header {
+    padding: 12px 16px !important;
+    font-size: 13px;
+  }
+
+  .ant-collapse-content-box {
+    padding: 12px 16px !important;
+  }
+
+  /* 表单响应式优化 */
+  .ant-form-item-label {
+    padding-bottom: 4px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+
+  /* 下拉框和输入框优化 */
+  .ant-select,
+  .ant-input,
+  .ant-picker {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  .ant-space {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ant-space>* {
+    width: 100%;
+  }
+
+  /* 工作流编辑器响应式优化 */
+  .workflow-page .react-flow__container {
+    height: 400px !important;
+  }
+
+  .workflow-page .ant-card-head-title {
+    font-size: 14px;
+  }
+
+  .workflow-page .ant-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  /* 调整操作面板按钮布局 */
+  .workflow-page .ant-card-body .ant-space {
+    gap: 8px;
+  }
+}
+
+/* 自定义组件样式 */
+.app-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+/* 提示词编辑器变量高亮 */
+.variable-highlight {
+  color: #1890ff;
+  font-weight: bold;
+  background-color: rgba(24, 144, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.page-container {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* 按钮样式 */
+.primary-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* 表格样式 */
+.data-table {
+  margin-top: 24px;
+}
+
+/* 表单样式 */
+.form-item {
+  margin-bottom: 16px;
+}
+
+/* 响应式工具类 */
+.responsive-hidden-xs {
+  display: block;
+}
+
+.responsive-visible-xs {
+  display: none;
+}
+
+@media (max-width: 576px) {
+  .responsive-hidden-xs {
+    display: none;
+  }
+
+  .responsive-visible-xs {
+    display: block;
+  }
+}
