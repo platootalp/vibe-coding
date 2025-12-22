@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Popconfirm, Modal, Form, Input, Select, Tag, Space, Typography, Layout, Card, Row, Col, Divider } from 'antd';
+import { Table, Button, Popconfirm, Modal, Form, Input, Select, Tag, Space, Typography, Layout, Card, Row, Col, Divider, Avatar, Dropdown, Menu } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -154,6 +154,8 @@ const AppManagement: React.FC = () => {
       title: '应用名称',
       dataIndex: 'name',
       key: 'name',
+      width: 200,
+      align: 'left',
       render: (text: string, record: App) => (
         <Space>
           {getAppTypeTag(record.type)}
@@ -165,29 +167,39 @@ const AppManagement: React.FC = () => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
+      width: 100,
+      align: 'center',
       render: (text: string) => getAppTypeTag(text),
     },
     {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      width: 300,
+      align: 'left',
       ellipsis: true,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
+      align: 'center',
       render: (text: string) => getAppStatusTag(text),
     },
     {
       title: '创建时间',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 180,
+      align: 'center',
       render: (text: string) => new Date(text).toLocaleString(),
     },
     {
       title: '操作',
       key: 'action',
+      width: 250,
+      align: 'center',
       render: (_: any, record: App) => (
         <Space size="middle">
           <Button type="text" icon={<EditOutlined />} onClick={() => showModal(record)}>
@@ -226,15 +238,25 @@ const AppManagement: React.FC = () => {
             <Title level={2} style={{ margin: 0, color: '#1890ff', fontWeight: 600 }}>应用管理</Title>
             <Text type="secondary" style={{ fontSize: 14 }}>管理所有应用的创建、编辑、发布和运行</Text>
           </div>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => showModal()}
-            size="large"
-            style={{ height: 40, borderRadius: 6, boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)' }}
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="1">个人中心</Menu.Item>
+                <Menu.Item key="2">设置</Menu.Item>
+                <Menu.Item key="3">退出登录</Menu.Item>
+              </Menu>
+            }
+            trigger={['click']}
           >
-            新建应用
-          </Button>
+            <Button
+              type="default"
+              size="large"
+              style={{ height: 40, borderRadius: 6, border: 'none', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}
+            >
+              <Avatar size="small" icon={<FileTextOutlined />} style={{ marginRight: 8 }} />
+              用户设置
+            </Button>
+          </Dropdown>
         </div>
 
         <Card style={{ border: '1px solid #e8e8e8', borderRadius: 12, boxShadow: 'none' }}>

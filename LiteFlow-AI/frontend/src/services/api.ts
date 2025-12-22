@@ -428,53 +428,53 @@ apiClient.interceptors.response.use(
 // 创建带Mock支持的API客户端
 const apiClientWithMock: AxiosInstance = {
   ...apiClient,
-  request: async <T>(config: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  request: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(config: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>(config);
+      return mockRequestHandler<T>(config) as unknown as R;
     }
-    return apiClient.request<T, AxiosResponse<ApiResponse<T>>>(config);
+    return apiClient.request<T, R, D>(config);
   },
-  get: async <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  get: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'get' });
+      return mockRequestHandler<T>({ ...config, url, method: 'get' }) as unknown as R;
     }
-    return apiClient.get<T, AxiosResponse<ApiResponse<T>>>(url, config);
+    return apiClient.get<T, R, D>(url, config);
   },
-  post: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  post: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'post', data });
+      return mockRequestHandler<T>({ ...config, url, method: 'post', data }) as unknown as R;
     }
-    return apiClient.post<T, AxiosResponse<ApiResponse<T>>>(url, data, config);
+    return apiClient.post<T, R, D>(url, data, config);
   },
-  put: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  put: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'put', data });
+      return mockRequestHandler<T>({ ...config, url, method: 'put', data }) as unknown as R;
     }
-    return apiClient.put<T, AxiosResponse<ApiResponse<T>>>(url, data, config);
+    return apiClient.put<T, R, D>(url, data, config);
   },
-  delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  delete: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'delete' });
+      return mockRequestHandler<T>({ ...config, url, method: 'delete' }) as unknown as R;
     }
-    return apiClient.delete<T, AxiosResponse<ApiResponse<T>>>(url, config);
+    return apiClient.delete<T, R, D>(url, config);
   },
-  patch: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  patch: async <T = any, R = AxiosResponse<ApiResponse<T>>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'patch', data });
+      return mockRequestHandler<T>({ ...config, url, method: 'patch', data }) as unknown as R;
     }
-    return apiClient.patch<T, AxiosResponse<ApiResponse<T>>>(url, data, config);
+    return apiClient.patch<T, R, D>(url, data, config);
   },
-  head: async <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  head: async <T = any, R = AxiosResponse<ApiResponse<T>>>(url: string, config?: AxiosRequestConfig): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'head' });
+      return mockRequestHandler<T>({ ...config, url, method: 'head' }) as unknown as R;
     }
-    return apiClient.head<T, AxiosResponse<ApiResponse<T>>>(url, config);
+    return apiClient.head<T, R>(url, config);
   },
-  options: async <T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<ApiResponse<T>>> => {
+  options: async <T = any, R = AxiosResponse<ApiResponse<T>>>(url: string, config?: AxiosRequestConfig): Promise<R> => {
     if (ENABLE_MOCK) {
-      return mockRequestHandler<T>({ ...config, url, method: 'options' });
+      return mockRequestHandler<T>({ ...config, url, method: 'options' }) as unknown as R;
     }
-    return apiClient.options<T, AxiosResponse<ApiResponse<T>>>(url, config);
+    return apiClient.options<T, R>(url, config);
   }
 };
 

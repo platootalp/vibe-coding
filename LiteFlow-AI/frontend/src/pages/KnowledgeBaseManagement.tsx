@@ -204,6 +204,8 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '名称',
       dataIndex: 'name',
       key: 'name',
+      width: 180,
+      align: 'left',
       render: (text: string, record: KnowledgeBase) => (
         <Text strong>{text}</Text>
       ),
@@ -212,6 +214,8 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '文档数量',
       dataIndex: 'document_count',
       key: 'document_count',
+      width: 120,
+      align: 'center',
       render: (count: number) => (
         <Tag color={count > 0 ? 'green' : 'default'}>{count}</Tag>
       ),
@@ -220,17 +224,23 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      width: 250,
+      align: 'left',
       ellipsis: true,
     },
     {
       title: '创建时间',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 180,
+      align: 'center',
       render: (text: string) => new Date(text).toLocaleString(),
     },
     {
       title: '操作',
       key: 'action',
+      width: 200,
+      align: 'center',
       render: (_: any, record: KnowledgeBase) => (
         <Space size="middle">
           <Tooltip title="查看文档">
@@ -268,6 +278,8 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '文档名称',
       dataIndex: 'name',
       key: 'name',
+      width: 200,
+      align: 'left',
       render: (text: string, record: Document) => (
         <Text strong>{text}</Text>
       ),
@@ -276,6 +288,8 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '内容预览',
       dataIndex: 'content',
       key: 'content',
+      width: 300,
+      align: 'left',
       render: (text: string) => (
         <Text ellipsis={{ tooltip: text }}>{text.substring(0, 100)}...</Text>
       ),
@@ -284,11 +298,15 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '创建时间',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 180,
+      align: 'center',
       render: (text: string) => new Date(text).toLocaleString(),
     },
     {
       title: '操作',
       key: 'action',
+      width: 150,
+      align: 'center',
       render: (_: any, record: Document) => (
         <Space size="middle">
           <Tooltip title="查看详情">

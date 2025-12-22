@@ -1,5 +1,5 @@
 import apiClient from './api';
-import { Metric, Trace, TraceSpan, AppUsage, LogEntry, ApiResponse } from '../types/api';
+import { Metric, Trace, AppUsage, LogEntry, ApiResponse } from '../types/api';
 
 export const monitorService = {
   // 指标相关

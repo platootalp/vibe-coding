@@ -1,4 +1,4 @@
-import { App, PromptTemplate, KnowledgeBase, Document, Workflow, WorkflowNode, WorkflowEdge, DebugSession, DebugLog, DebugStep, Metric, Trace, TraceSpan, TraceEvent, AppUsage, LogEntry } from '../types/api';
+import { App, PromptTemplate, KnowledgeBase, Document, Workflow, DebugSession, DebugStep, Metric, Trace, AppUsage, LogEntry } from '../types/api';
 
 // 模拟应用数据
 export const mockApps: App[] = [

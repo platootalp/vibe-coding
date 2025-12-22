@@ -266,7 +266,7 @@ const PromptEditor: React.FC<PromptEditorProps> = ({ value, onChange, onSave, on
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
                         <Tag color="blue">{variable.type}</Tag>
-                        <strong style={{ marginLeft: 8 }}>{{{variable.name}}}</strong>
+                        <strong style={{ marginLeft: 8 }}>{`{{${variable.name}}}`}</strong>
                       </div>
                       <div style={{ color: '#666', marginBottom: 8 }}>{variable.description}</div>
                       {variable.defaultValue && (
