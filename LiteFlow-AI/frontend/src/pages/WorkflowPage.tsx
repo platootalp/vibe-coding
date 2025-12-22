@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Tabs, Input, Select, Space, Table, Modal, Form, message, Tooltip, Layout, Typography } from 'antd';
+import { Card, Button, Tabs, Input, Space, Table, Modal, Form, message, Tooltip, Layout, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, CheckCircleOutlined, DownloadOutlined, UploadOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import ReactFlow, {
   Background,
@@ -25,8 +25,7 @@ const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const { TabPane } = Tabs;
-const { Option } = Select;
-const { TextArea } = Input;
+
 
 // 自定义节点类型
 const nodeTypes: NodeTypes = {};
@@ -43,8 +42,8 @@ const WorkflowPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('list');
 
   // React Flow状态
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
+  const [nodes, setNodes] = useNodesState<Node[]>([]);
+  const [edges, setEdges] = useEdgesState<Edge[]>([]);
 
   // 加载工作流列表
   const fetchWorkflows = async () => {
@@ -170,9 +169,25 @@ const WorkflowPage: React.FC = () => {
 
     setLoading(true);
     try {
+      // 将ReactFlow的nodes和edges转换为WorkflowNode和WorkflowEdge类型
+      const workflowNodes: WorkflowNode[] = nodes.map(node => ({
+        id: node.id,
+        type: node.type || 'default',
+        data: node.data,
+        position: node.position,
+      }));
+
+      const workflowEdges: WorkflowEdge[] = edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type || 'default',
+        data: edge.data,
+      }));
+
       const updatedWorkflow = await workflowService.updateWorkflow(selectedWorkflow.id, {
-        nodes,
-        edges,
+        nodes: workflowNodes,
+        edges: workflowEdges,
       });
       setSelectedWorkflow(updatedWorkflow);
       setWorkflows(workflows.map(wf => wf.id === updatedWorkflow.id ? updatedWorkflow : wf));
@@ -370,11 +385,18 @@ const WorkflowPage: React.FC = () => {
                 }}
                 bordered={false}
                 size="middle"
-                rowClassName={(record, index) => index % 2 === 0 ? 'table-row-even' : 'table-row-odd'}
-                onRow={(record) => ({
-                  style: { cursor: 'pointer', transition: 'all 0.3s' },
-                  onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#fafafa'; },
-                  onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#fafafa' : '#fff'; }
+                rowClassName={(_, index = 0) => index % 2 === 0 ? 'table-row-even' : 'table-row-odd'}
+                onRow={(_, index = 0) => ({
+                  style: {
+                    cursor: 'pointer',
+                    transition: 'all 0.3s'
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.backgroundColor = '#fafafa';
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#fafafa' : '#fff';
+                  }
                 })}
               />
             </TabPane>
@@ -403,7 +425,7 @@ const WorkflowPage: React.FC = () => {
                       <Button icon={<SaveOutlined />} onClick={saveWorkflow}>保存</Button>
                       <Button icon={<PlayCircleOutlined />} onClick={executeWorkflow}>执行</Button>
                       {selectedWorkflow.status === 'draft' && (
-                        <Button type="success" icon={<CheckCircleOutlined />} onClick={publishWorkflow}>发布</Button>
+                        <Button type="primary" icon={<CheckCircleOutlined />} onClick={publishWorkflow}>发布</Button>
                       )}
                       <Button icon={<DownloadOutlined />}>导出</Button>
                       <Button icon={<UploadOutlined />}>导入</Button>
@@ -421,7 +443,7 @@ const WorkflowPage: React.FC = () => {
                       edgeTypes={edgeTypes}
                       fitView
                     >
-                      <Background variant="dots" gap={12} size={1} />
+                      <Background gap={12} size={1} />
                       <Controls />
                       <MiniMap />
                       <Panel position="top-left">

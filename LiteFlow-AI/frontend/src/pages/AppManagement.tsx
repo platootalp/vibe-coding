@@ -274,8 +274,8 @@ const AppManagement: React.FC = () => {
             bordered={false}
             size="middle"
             style={{ borderRadius: 8 }}
-            rowClassName={(record, index) => index % 2 === 0 ? 'table-row-even' : 'table-row-odd'}
-            onRow={(record) => ({
+            rowClassName={(_, index = 0) => index % 2 === 0 ? 'table-row-even' : 'table-row-odd'}
+            onRow={(_, index = 0) => ({
               style: {
                 cursor: 'pointer',
                 transition: 'all 0.3s'
