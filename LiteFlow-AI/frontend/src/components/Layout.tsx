@@ -6,7 +6,6 @@ import {
   DatabaseOutlined,
   CodeOutlined,
   BarChartOutlined,
-  PlusOutlined,
   SettingOutlined
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
@@ -67,11 +66,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <CodeOutlined style={{ fontSize: 24, color: '#1890ff' }} />
           <Title level={2} style={{ margin: 0, color: '#1890ff' }}>LiteFlow AI</Title>
         </Space>
-        <div>
-          <Button type="primary" icon={<PlusOutlined />} size="large">
-            新建应用
-          </Button>
-        </div>
+
       </Header>
       <AntLayout>
         <Sider width={200} theme="light">

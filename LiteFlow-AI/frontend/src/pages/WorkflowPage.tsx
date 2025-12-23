@@ -337,13 +337,15 @@ const WorkflowPage: React.FC = () => {
     {
       title: '操作',
       key: 'action',
+      width: 300,
+      align: 'center',
       render: (_: any, record: Workflow) => (
-        <Space size="middle">
-          <Button type="link" icon={<EditOutlined />} onClick={() => showModal('edit', record)}>编辑</Button>
-          <Button type="link" danger icon={<DeleteOutlined />} onClick={() => deleteWorkflow(record.id)}>删除</Button>
-          <Button type="link" icon={<PlayCircleOutlined />} onClick={() => executeWorkflow()}>执行</Button>
+        <Space size="small" wrap style={{ width: '100%' }}>
+          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => showModal('edit', record)}>编辑</Button>
+          <Button type="link" danger size="small" icon={<DeleteOutlined />} onClick={() => deleteWorkflow(record.id)}>删除</Button>
+          <Button type="link" size="small" icon={<PlayCircleOutlined />} onClick={() => executeWorkflow()}>执行</Button>
           {record.status === 'draft' && (
-            <Button type="link" icon={<CheckCircleOutlined />} onClick={() => publishWorkflow()}>发布</Button>
+            <Button type="link" size="small" icon={<CheckCircleOutlined />} onClick={() => publishWorkflow()}>发布</Button>
           )}
         </Space>
       ),
@@ -471,7 +473,7 @@ const WorkflowPage: React.FC = () => {
           width={700}
           style={{ borderRadius: 12 }}
           bodyStyle={{ padding: 24 }}
-          destroyOnClose
+          destroyOnHidden
           centered
         >
           <Form

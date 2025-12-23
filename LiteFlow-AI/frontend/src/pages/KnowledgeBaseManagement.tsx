@@ -224,7 +224,7 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
-      width: 250,
+      width: 200,
       align: 'left',
       ellipsis: true,
     },
@@ -239,13 +239,14 @@ const KnowledgeBaseManagement: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 320,
       align: 'center',
       render: (_: any, record: KnowledgeBase) => (
-        <Space size="middle">
+        <Space size="small" wrap style={{ width: '100%' }}>
           <Tooltip title="查看文档">
             <Button
               type="primary"
+              size="small"
               icon={<FolderOpenOutlined />}
               onClick={() => handleKBSelect(record)}
             >
@@ -253,7 +254,7 @@ const KnowledgeBaseManagement: React.FC = () => {
             </Button>
           </Tooltip>
           <Tooltip title="编辑">
-            <Button type="default" icon={<EditOutlined />} onClick={() => showModal(record)}>
+            <Button type="default" size="small" icon={<EditOutlined />} onClick={() => showModal(record)}>
               编辑
             </Button>
           </Tooltip>
@@ -263,7 +264,7 @@ const KnowledgeBaseManagement: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Button type="text" danger icon={<DeleteOutlined />}>
+            <Button type="text" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -288,7 +289,7 @@ const KnowledgeBaseManagement: React.FC = () => {
       title: '内容预览',
       dataIndex: 'content',
       key: 'content',
-      width: 300,
+      width: 250,
       align: 'left',
       render: (text: string) => (
         <Text ellipsis={{ tooltip: text }}>{text.substring(0, 100)}...</Text>
@@ -305,12 +306,12 @@ const KnowledgeBaseManagement: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 250,
       align: 'center',
       render: (_: any, record: Document) => (
-        <Space size="middle">
+        <Space size="small" wrap style={{ width: '100%' }}>
           <Tooltip title="查看详情">
-            <Button type="primary" icon={<EyeOutlined />} onClick={() => showDocModal(record)}>
+            <Button type="primary" size="small" icon={<EyeOutlined />} onClick={() => showDocModal(record)}>
               查看
             </Button>
           </Tooltip>
@@ -320,7 +321,7 @@ const KnowledgeBaseManagement: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Button type="text" danger icon={<DeleteOutlined />}>
+            <Button type="text" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -487,7 +488,7 @@ const KnowledgeBaseManagement: React.FC = () => {
           width={700}
           style={{ borderRadius: 12 }}
           bodyStyle={{ padding: 24 }}
-          destroyOnClose
+          destroyOnHidden
           centered
         >
           <Form
@@ -582,7 +583,7 @@ const KnowledgeBaseManagement: React.FC = () => {
           onCancel={handleDocCancel}
           footer={null}
           width={900}
-          destroyOnClose
+          destroyOnHidden
           centered
           style={{ borderRadius: 12 }}
           bodyStyle={{ padding: 24 }}

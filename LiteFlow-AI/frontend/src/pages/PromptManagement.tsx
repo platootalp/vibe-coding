@@ -156,12 +156,14 @@ const PromptManagement: React.FC = () => {
     {
       title: '操作',
       key: 'action',
+      width: 250,
+      align: 'center',
       render: (_: any, record: PromptTemplate) => (
-        <Space size="middle">
-          <Button type="text" icon={<EyeOutlined />} onClick={() => showTestModal(record)}>
+        <Space size="small" wrap style={{ width: '100%' }}>
+          <Button type="text" size="small" icon={<EyeOutlined />} onClick={() => showTestModal(record)}>
             测试
           </Button>
-          <Button type="text" icon={<EditOutlined />} onClick={() => showModal(record)}>
+          <Button type="text" size="small" icon={<EditOutlined />} onClick={() => showModal(record)}>
             编辑
           </Button>
           <Popconfirm
@@ -170,7 +172,7 @@ const PromptManagement: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Button type="text" danger icon={<DeleteOutlined />}>
+            <Button type="text" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -236,7 +238,7 @@ const PromptManagement: React.FC = () => {
           onCancel={handleCancel}
           footer={null}
           width={800}
-          destroyOnClose
+          destroyOnHidden
           maskClosable={false}
           centered
           style={{ borderRadius: 12 }}

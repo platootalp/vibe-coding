@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import moment from 'moment';
 import { Tabs, Card, Table, Space, Tag, Input, Select, DatePicker, Typography, Statistic, Row, Col, Descriptions, List, Button } from 'antd';
 import { BarChartOutlined, LogoutOutlined, DatabaseOutlined, ClockCircleOutlined, AlertOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { monitorService } from '../services/monitorService';
@@ -25,7 +26,7 @@ const MonitoringPage: React.FC = () => {
   const [filters, setFilters] = useState({
     appId: '',
     period: '24h',
-    timeRange: [new Date(Date.now() - 24 * 60 * 60 * 1000), new Date()],
+    timeRange: [moment().subtract(24, 'hours'), moment()],
     logLevel: '',
     logSource: '',
     metricName: '',
@@ -55,6 +56,13 @@ const MonitoringPage: React.FC = () => {
       }
     };
     fetchSystemStatus();
+  }, []);
+
+  // 页面加载时自动获取数据
+  useEffect(() => {
+    fetchAppUsage();
+    fetchLogs();
+    fetchTraces();
   }, []);
 
   // 获取应用使用情况
@@ -263,31 +271,50 @@ const MonitoringPage: React.FC = () => {
   const renderSystemStatusCards = () => {
     if (!systemStatus) return null;
 
+    // 计算系统状态
+    const calculateSystemStatus = () => {
+      const cpuUsage = systemStatus.cpu_usage || 0;
+      const memoryUsage = systemStatus.memory_usage || 0;
+
+      if (cpuUsage > 80 || memoryUsage > 80) {
+        return { status: '警告', color: '#faad14' };
+      } else if (cpuUsage > 90 || memoryUsage > 90) {
+        return { status: '危险', color: '#cf1322' };
+      } else {
+        return { status: '健康', color: '#3f8600' };
+      }
+    };
+
+    const systemHealth = calculateSystemStatus();
+
     return (
       <Row gutter={[16, 16]}>
         <Col span={6}>
           <Card>
             <Statistic
               title="系统状态"
-              value={systemStatus.overall_status || '未知'}
-              valueStyle={{ color: systemStatus.overall_status === 'healthy' ? '#3f8600' : '#cf1322' }}
+              value={systemHealth.status}
+              valueStyle={{ color: systemHealth.color }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card>
             <Statistic
-              title="API 响应时间"
-              value={systemStatus.api_response_time || 0}
-              suffix="ms"
+              title="内存使用率"
+              value={systemStatus.memory_usage || 0}
+              suffix="%"
+              valueStyle={{ color: systemStatus.memory_usage > 80 ? '#faad14' : '#3f8600' }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card>
             <Statistic
-              title="活跃连接数"
-              value={systemStatus.active_connections || 0}
+              title="磁盘使用率"
+              value={systemStatus.disk_usage || 0}
+              suffix="%"
+              valueStyle={{ color: systemStatus.disk_usage > 80 ? '#faad14' : '#3f8600' }}
             />
           </Card>
         </Col>
@@ -297,6 +324,7 @@ const MonitoringPage: React.FC = () => {
               title="CPU 使用率"
               value={systemStatus.cpu_usage || 0}
               suffix="%"
+              valueStyle={{ color: systemStatus.cpu_usage > 80 ? '#faad14' : '#3f8600' }}
             />
           </Card>
         </Col>

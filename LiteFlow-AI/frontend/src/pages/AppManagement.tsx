@@ -175,7 +175,7 @@ const AppManagement: React.FC = () => {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
-      width: 300,
+      width: 250,
       align: 'left',
       ellipsis: true,
     },
@@ -198,11 +198,11 @@ const AppManagement: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 250,
+      width: 400,
       align: 'center',
       render: (_: any, record: App) => (
-        <Space size="middle">
-          <Button type="text" icon={<EditOutlined />} onClick={() => showModal(record)}>
+        <Space size="small" wrap style={{ width: '100%' }}>
+          <Button type="text" size="small" icon={<EditOutlined />} onClick={() => showModal(record)}>
             编辑
           </Button>
           <Popconfirm
@@ -211,17 +211,17 @@ const AppManagement: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Button type="text" danger icon={<DeleteOutlined />}>
+            <Button type="text" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
           {record.status === 'draft' && (
-            <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => handlePublish(record.id)}>
+            <Button type="primary" size="small" icon={<PlayCircleOutlined />} onClick={() => handlePublish(record.id)}>
               发布
             </Button>
           )}
           {record.status === 'published' && (
-            <Button type="success" icon={<PlayCircleOutlined />} onClick={() => handleStart(record.id)}>
+            <Button type="success" size="small" icon={<PlayCircleOutlined />} onClick={() => handleStart(record.id)}>
               启动
             </Button>
           )}
@@ -297,7 +297,7 @@ const AppManagement: React.FC = () => {
           onCancel={handleCancel}
           footer={null}
           width={700}
-          destroyOnClose
+          destroyOnHidden
           maskClosable={false}
           centered
           style={{ borderRadius: 12 }}
