@@ -1,0 +1,152 @@
+# 代码代理客户端 (Code Agent Client)
+
+一个基于Python的AI驱动编码助手，旨在帮助开发人员完成各种软件开发任务。
+
+## 功能特性
+
+- 根据自然语言描述生成代码片段
+- 支持多种编程语言（Python、JavaScript、TypeScript、Java、C++等）
+- 分析现有代码中的错误、漏洞和性能问题
+- 提供代码质量指标和改进建议
+- 通过分析错误消息和堆栈跟踪帮助用户调试代码
+- 建议重构机会以提高代码质量
+- 维护编程概念和最佳实践的知识库
+- 支持与流行代码编辑器集成
+
+## 技术栈
+
+- **主要语言**: Python 3.14.2
+- **包管理器**: uv (0.9.24)
+- **HTTP客户端**: httpx
+- **AI模型集成**: 
+  - openai (用于GPT模型)
+  - anthropic (用于Claude模型)
+  - google-generativeai (用于Gemini模型)
+- **命令行界面**: Typer
+- **配置管理**: Pydantic
+- **本地存储**: SQLite + SQLAlchemy
+- **API服务器**: FastAPI
+- **加密**: cryptography
+
+## 开发环境设置
+
+### 前提条件
+
+- Python 3.14.2
+- uv 0.9.24
+
+### 安装步骤
+
+1. **克隆项目仓库**
+   ```bash
+   git clone <repository-url>
+   cd code-agent-client
+   ```
+
+2. **创建虚拟环境**
+   ```bash
+   uv venv
+   ```
+
+3. **激活虚拟环境**
+   ```bash
+   source .venv/bin/activate
+   ```
+
+4. **安装依赖**
+   ```bash
+   uv pip install -e .
+   ```
+
+5. **安装开发依赖**
+   ```bash
+   uv pip install -e .[dev]
+   ```
+
+### 配置文件
+
+项目使用以下配置文件：
+
+- `pyproject.toml`: 项目依赖和配置
+- `uv.toml`: uv包管理器配置
+- `code_agent_client/config.py`: 应用配置
+
+## 使用方法
+
+### 命令行界面
+
+```bash
+# 启动应用
+code-agent-client
+
+# 查看帮助信息
+code-agent-client --help
+```
+
+### Web界面
+
+```bash
+# 启动Web服务器
+uvicorn code_agent_client.web:app --reload
+```
+
+然后在浏览器中访问 `http://localhost:8000`
+
+## 项目结构
+
+```
+code-agent-client/
+├── code_agent_client/        # 主源码目录
+│   ├── cli/                  # 命令行界面
+│   ├── ai/                   # AI模型集成
+│   ├── core/                 # 核心功能
+│   ├── storage/              # 本地存储
+│   ├── utils/                # 工具函数
+│   └── __init__.py
+├── docs/                     # 文档
+├── tests/                    # 测试代码
+├── .python-version           # Python版本指定
+├── README.md                 # 项目说明
+├── pyproject.toml            # 项目配置
+└── uv.toml                   # uv配置
+```
+
+## 开发指南
+
+### 代码质量
+
+- 使用 Black 进行代码格式化
+  ```bash
+  uv run black .
+  ```
+
+- 使用 Ruff 进行代码检查
+  ```bash
+  uv run ruff check .
+  ```
+
+- 使用 MyPy 进行类型检查
+  ```bash
+  uv run mypy .
+  ```
+
+### 测试
+
+```bash
+# 运行所有测试
+uv run pytest
+
+# 运行特定测试文件
+uv run pytest tests/test_<module>.py
+
+# 运行测试并显示代码覆盖率
+uv run pytest --cov=code_agent_client
+```
+
+## 贡献
+
+欢迎提交Issue和Pull Request！
+
+## 许可证
+
+[MIT License](LICENSE)
